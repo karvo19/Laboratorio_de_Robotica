@@ -40,6 +40,8 @@ int D_dif; // distancia diferencial
 int DD;  // distancia del sensor ultrasonidos derecho a la pared en linea recta
 int DI;  // distancia del sensor ultrasonidos izquierdo a la pared en linea recta
 
+float duracionD, duracionI;
+
 SoftwareSerial BT1(BTTX, BTRX); // TX del bluetooth al pin 10, RX del bluetooth al pin 11
 char input;
 
@@ -52,16 +54,16 @@ int Modo = 0;   // 0 -> parado
 int Ref_dist = 30;
 int Ref_dif = 0;
 
-double Kp_dist = 0;
-double Kd_dist = 0;
-double Ki_dist = 0;
+double Kp_dist = 5;
+double Kd_dist = 0.21;
+double Ki_dist = 3.4;
 
-double Kp_dif = 25;
+double Kp_dif = 0;
 double Kd_dif = 0;
 double Ki_dif = 0;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(250000);
   BT1.begin(9600);
   
   pinMode(END,OUTPUT);
@@ -78,9 +80,12 @@ void setup() {
   pinMode(USITRIG, OUTPUT);
 
   delay(300);
+  pinMode(BTPWR, OUTPUT);
   digitalWrite(BTPWR, HIGH);
+  pinMode(USDPWR, OUTPUT);
+  pinMode(USIPWR, OUTPUT);
   digitalWrite(USDPWR, HIGH);
-  digitalWrite(USDPWR, HIGH);
+  digitalWrite(USIPWR, HIGH);
 
   tiempo = millis();
 }
@@ -89,6 +94,9 @@ void loop() {
   timePrev = tiempo;
   tiempo = millis();
   elapsedTime = (tiempo - timePrev) / 1000;
+
+  if (BT1.available())
+    input = BT1.read();
   
   digitalWrite(USDTRIG, LOW);
   delayMicroseconds(4);
@@ -96,7 +104,7 @@ void loop() {
   delayMicroseconds(10);
   digitalWrite(USDTRIG, LOW);
   
-  DD = pulseIn(USDECHO, HIGH) * 10 / 292 / 2;
+  duracionD = pulseIn(USDECHO, HIGH);
   
   digitalWrite(USITRIG, LOW);
   delayMicroseconds(4);
@@ -104,11 +112,14 @@ void loop() {
   delayMicroseconds(10);
   digitalWrite(USITRIG, LOW);
   
-  DI = pulseIn(USIECHO, HIGH) * 10 / 292 / 2;
+  duracionI = pulseIn(USIECHO, HIGH);
+
+  DD = duracionD * 10 / 292 / 2;
+  DI = duracionI * 10 / 292 / 2;
 
   D = (DD + DI)/2;
   prev_error_dist = error_dist;
-  error_dist = Ref_dif - D;
+  error_dist = D - Ref_dist;
   int_error_dist += elapsedTime * error_dist;
   u_dist = Kp_dist * error_dist + Ki_dist * int_error_dist + Kd_dist * (error_dist - prev_error_dist) / elapsedTime;
 
@@ -166,5 +177,26 @@ void loop() {
   Serial.print("\t");
 
   Serial.print(u_D);
-  Serial.print("\t");
+  Serial.print("\n");
+
+  BT1.write(elapsedTime * 1000);
+  BT1.write("\t");
+  
+  BT1.write(DI);
+  BT1.write("\t");
+
+  BT1.write(DD);
+  BT1.write("\t");
+
+  BT1.write(Ref_dist);
+  BT1.write("\t");
+
+  BT1.write(Modo);
+  BT1.write("\t");
+
+  BT1.write(u_I);
+  BT1.write("\t");
+
+  BT1.write(u_D);
+  BT1.write("\n");
 }
