@@ -42,7 +42,6 @@ int DI;  // distancia del sensor ultrasonidos izquierdo a la pared en linea rect
 
 float duracionD, duracionI;
 
-SoftwareSerial BT1(BTTX, BTRX); // TX del bluetooth al pin 10, RX del bluetooth al pin 11
 char input;
 
 int Modo = 0;   // 0 -> parado   
@@ -51,20 +50,52 @@ int Modo = 0;   // 0 -> parado
                 // 3 -> paralelo lateral a 50 cm
                 // 4 -> paralelo lateral con referencia ajustable
 
+// Referencias iniciales
 int Ref_dist = 30;
 int Ref_dif = 0;
 
-double Kp_dist = 5;
-double Kd_dist = 0.21;
-double Ki_dist = 3.4;
+// Constantes de control
+//Modo 1
+  // Control de distancia
+  double Kp_dist_1 = 10;
+  double Kd_dist_1 = 2;
+  double Ki_dist_1 = 3;
 
-double Kp_dif = 0;
-double Kd_dif = 0;
-double Ki_dif = 0;
+//Modo 2
+  // Control de distancia
+  double Kp_dist_2 = 10;
+  double Kd_dist_2 = 2;
+  double Ki_dist_2 = 3;
+
+  // Control de angulo
+  double Kp_dif_2 = 7;
+  double Kd_dif_2 = 0;
+  double Ki_dif_2 = 0;
+
+//Modo 3
+  // Control de distancia
+  double Kp_dist_3 = 0;
+  double Kd_dist_3 = 0;
+  double Ki_dist_3 = 0;
+
+  // Control de angulo
+  double Kp_dif_3 = 0;
+  double Kd_dif_3 = 0;
+  double Ki_dif_3 = 0;
+
+//Modo 4
+  // Control de distancia
+  double Kp_dist_4 = 0;
+  double Kd_dist_4 = 0;
+  double Ki_dist_4 = 0;
+
+  // Control de angulo
+  double Kp_dif_4 = 0;
+  double Kd_dif_4 = 0;
+  double Ki_dif_4 = 0;
 
 void setup() {
-  Serial.begin(250000);
-  BT1.begin(9600);
+  Serial.begin(38400);
   
   pinMode(END,OUTPUT);
   pinMode(IN3,OUTPUT);
@@ -90,14 +121,32 @@ void setup() {
   tiempo = millis();
 }
 
+int leer_numero() {
+  int numero = 0;
+  while(Serial.available()) {
+    numero = numero * 10 + (Serial.read() - '0');
+  }
+  return numero;
+}
+
 void loop() {
   timePrev = tiempo;
   tiempo = millis();
   elapsedTime = (tiempo - timePrev) / 1000;
 
-  if (BT1.available())
-    input = BT1.read();
-  
+  if (Serial.available()) {
+    if(Serial.read() == 'm' || Serial.read() == 'M') {
+      while(!(Serial.available()));
+        input = leer_numero();
+        if(0 <= input && input <= 4)  Modo = input;
+    }
+    if(Serial.read() == 'r' || Serial.read() == 'R') {
+      while(!(Serial.available()));
+        Ref_dist = leer_numero();        
+    }
+  }
+
+  // Lectura de los ultrasonidos
   digitalWrite(USDTRIG, LOW);
   delayMicroseconds(4);
   digitalWrite(USDTRIG, HIGH);
@@ -117,86 +166,126 @@ void loop() {
   DD = duracionD * 10 / 292 / 2;
   DI = duracionI * 10 / 292 / 2;
 
-  D = (DD + DI)/2;
-  prev_error_dist = error_dist;
-  error_dist = D - Ref_dist;
-  int_error_dist += elapsedTime * error_dist;
-  u_dist = Kp_dist * error_dist + Ki_dist * int_error_dist + Kd_dist * (error_dist - prev_error_dist) / elapsedTime;
-
-  D_dif = DD - DI;
-  prev_error_dif = error_dif;
-  error_dif = Ref_dif - D_dif;
-  int_error_dif += elapsedTime * error_dif;
-  u_dif = Kp_dif * error_dif + Ki_dif * int_error_dif + Kd_dif * (error_dif - prev_error_dif) / elapsedTime;
-
-  u_D = (u_dist + u_dif/2);
-  u_I = (u_dist - u_dif/2);
-
-  if (u_D > 0) {
-    digitalWrite(IN3, HIGH);
-    digitalWrite(IN4, LOW);
+  switch(Modo){
+    case 0:
+      u_D = 0;
+      u_I = 0;
+      break;
+      
+    case 1:
+      D = (DD + DI)/2;
+      prev_error_dist = error_dist;
+      error_dist = D - Ref_dist;
+      int_error_dist += elapsedTime * error_dist;
+      u_dist = Kp_dist_1 * error_dist + Ki_dist_1 * int_error_dist + Kd_dist_1 * (error_dist - prev_error_dist) / elapsedTime;
+    
+      u_D = u_dist;
+      u_I = u_dist;
+    
+      if (u_D > 0) {
+        digitalWrite(IN3, HIGH);
+        digitalWrite(IN4, LOW);
+      }
+      else {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, HIGH);
+      }
+      
+      if (u_I > 0) {
+        digitalWrite(IN1, HIGH);
+        digitalWrite(IN2, LOW);
+      }
+      else {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, HIGH);
+      }
+    
+      // Anti-windup
+      if (u_dist < -255 || 255 < u_dist)  int_error_dist -= elapsedTime * error_dist;
+    
+      // Saturaciones
+      if (u_D > 255)  u_D = 255;
+      else if (u_D < - 255) u_D = - 255;
+      if (u_I > 255)  u_I = 255;
+      else if (u_I < - 255) u_I = - 255;
+      
+      analogWrite(END, abs(u_D));
+      analogWrite(ENI, abs(u_I));
+      break;
+      
+    case 2:
+      D = (DD + DI)/2;
+      prev_error_dist = error_dist;
+      error_dist = D - Ref_dist;
+      int_error_dist += elapsedTime * error_dist;
+      u_dist = Kp_dist_2 * error_dist + Ki_dist_2 * int_error_dist + Kd_dist_2 * (error_dist - prev_error_dist) / elapsedTime;
+    
+      D_dif = DD - DI;
+      prev_error_dif = error_dif;
+      error_dif = Ref_dif - D_dif;
+      int_error_dif += elapsedTime * error_dif;
+      u_dif = Kp_dif_2 * error_dif + Ki_dif_2 * int_error_dif + Kd_dif_2 * (error_dif - prev_error_dif) / elapsedTime;
+    
+      u_D = (u_dist + u_dif/2);
+      u_I = (u_dist - u_dif/2);
+    
+      if (u_D > 0) {
+        digitalWrite(IN3, HIGH);
+        digitalWrite(IN4, LOW);
+      }
+      else {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, HIGH);
+      }
+      
+      if (u_I > 0) {
+        digitalWrite(IN1, HIGH);
+        digitalWrite(IN2, LOW);
+      }
+      else {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, HIGH);
+      }
+    
+      // Anti-windup
+      if (u_dist < -255 || 255 < u_dist)  int_error_dist -= elapsedTime * error_dist;
+      if (u_dif < -255 || 255 < u_dif)  int_error_dif -= elapsedTime * error_dif;
+    
+      // Saturaciones
+      if (u_D > 255)  u_D = 255;
+      else if (u_D < - 255) u_D = - 255;
+      if (u_I > 255)  u_I = 255;
+      else if (u_I < - 255) u_I = - 255;
+      
+      analogWrite(END, abs(u_D));
+      analogWrite(ENI, abs(u_I));
+      break;
+    case 3:
+      break;
+      
+    case 4:
+      break;
+      
+    default: break;
   }
-  else {
-    digitalWrite(IN3, LOW);
-    digitalWrite(IN4, HIGH);
-  }
-  
-  if (u_I > 0) {
-    digitalWrite(IN1, HIGH);
-    digitalWrite(IN2, LOW);
-  }
-  else {
-    digitalWrite(IN1, LOW);
-    digitalWrite(IN2, HIGH);
-  }
-
-  if (u_D > 255)  u_D = 255;
-  else if (u_D < - 255) u_D = - 255;
-  if (u_I > 255)  u_I = 255;
-  else if (u_I < - 255) u_I = - 255;
-  
-  analogWrite(END, abs(u_D));
-  analogWrite(ENI, abs(u_I));
 
   Serial.print(elapsedTime * 1000);
-  Serial.print("\t");
+  Serial.print(" ");
   
   Serial.print(DI);
-  Serial.print("\t");
+  Serial.print(" ");
 
   Serial.print(DD);
-  Serial.print("\t");
+  Serial.print(" ");
 
   Serial.print(Ref_dist);
-  Serial.print("\t");
+  Serial.print(" ");
 
   Serial.print(Modo);
-  Serial.print("\t");
+  Serial.print(" ");
 
   Serial.print(u_I);
-  Serial.print("\t");
+  Serial.print(" ");
 
-  Serial.print(u_D);
-  Serial.print("\n");
-
-  BT1.write(elapsedTime * 1000);
-  BT1.write("\t");
-  
-  BT1.write(DI);
-  BT1.write("\t");
-
-  BT1.write(DD);
-  BT1.write("\t");
-
-  BT1.write(Ref_dist);
-  BT1.write("\t");
-
-  BT1.write(Modo);
-  BT1.write("\t");
-
-  BT1.write(u_I);
-  BT1.write("\t");
-
-  BT1.write(u_D);
-  BT1.write("\n");
+  Serial.println(u_D);
 }
