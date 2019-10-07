@@ -125,6 +125,7 @@ int leer_numero() {
   int numero = 0;
   while(Serial.available()) {
     numero = numero * 10 + (Serial.read() - '0');
+    delay(1);
   }
   return numero;
 }
@@ -135,14 +136,15 @@ void loop() {
   elapsedTime = (tiempo - timePrev) / 1000;
 
   if (Serial.available()) {
-    if(Serial.read() == 'm' || Serial.read() == 'M') {
+    input = Serial.read();
+    if(input == 'm' || input == 'M') {
       while(!(Serial.available()));
         input = leer_numero();
         if(0 <= input && input <= 4)  Modo = input;
     }
-    if(Serial.read() == 'r' || Serial.read() == 'R') {
+    if(input == 'r' || input == 'R') {
       while(!(Serial.available()));
-        Ref_dist = leer_numero();        
+      Ref_dist = leer_numero();        
     }
   }
 
@@ -170,6 +172,13 @@ void loop() {
     case 0:
       u_D = 0;
       u_I = 0;
+
+      digitalWrite(IN3, LOW);
+      digitalWrite(IN4, LOW);
+    
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, LOW);
+      
       break;
       
     case 1:
@@ -181,8 +190,12 @@ void loop() {
     
       u_D = u_dist;
       u_I = u_dist;
-    
-      if (u_D > 0) {
+
+      if(u_D == 0) {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, LOW);
+      }
+      else if (u_D > 0) {
         digitalWrite(IN3, HIGH);
         digitalWrite(IN4, LOW);
       }
@@ -191,7 +204,11 @@ void loop() {
         digitalWrite(IN4, HIGH);
       }
       
-      if (u_I > 0) {
+      if(u_I == 0) {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, LOW);
+      }
+      else if (u_I > 0) {
         digitalWrite(IN1, HIGH);
         digitalWrite(IN2, LOW);
       }
@@ -229,7 +246,11 @@ void loop() {
       u_D = (u_dist + u_dif/2);
       u_I = (u_dist - u_dif/2);
     
-      if (u_D > 0) {
+      if(u_D == 0) {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, LOW);
+      }
+      else if (u_D > 0) {
         digitalWrite(IN3, HIGH);
         digitalWrite(IN4, LOW);
       }
@@ -238,7 +259,11 @@ void loop() {
         digitalWrite(IN4, HIGH);
       }
       
-      if (u_I > 0) {
+      if(u_I == 0) {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, LOW);
+      }
+      else if (u_I > 0) {
         digitalWrite(IN1, HIGH);
         digitalWrite(IN2, LOW);
       }
