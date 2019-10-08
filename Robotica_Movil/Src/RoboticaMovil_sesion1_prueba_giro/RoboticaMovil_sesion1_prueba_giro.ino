@@ -10,11 +10,11 @@
 #define USIECHO 42
 #define USITRIG 43
 
-#define END 2
+#define END 5
 #define IN3 23
 #define IN4 24
 
-#define ENI 3
+#define ENI 6
 #define IN1 25
 #define IN2 26
 
@@ -67,7 +67,7 @@ int Ref_dif = 0;
   double Ki_dist_2 = 3;
 
   // Control de angulo
-  double Kp_dif_2 = 7;
+  double Kp_dif_2 = 15;
   double Kd_dif_2 = 0;
   double Ki_dif_2 = 0;
 
