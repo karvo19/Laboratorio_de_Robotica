@@ -1,5 +1,3 @@
-#include <SoftwareSerial.h>
-
 #define BTPWR 22
 #define BTTX 0
 #define BTRX 1
@@ -42,7 +40,8 @@ int DI;  // distancia del sensor ultrasonidos izquierdo a la pared en linea rect
 
 float duracionD, duracionI;
 
-char input;
+char input[8];
+int i = 0;
 
 int Modo = 0;   // 0 -> parado   
                 // 1 -> control fontal
@@ -121,13 +120,32 @@ void setup() {
   tiempo = millis();
 }
 
-int leer_numero() {
+void leer_comando() {
   int numero = 0;
-  while(Serial.available()) {
-    numero = numero * 10 + (Serial.read() - '0');
-    delay(1);
+  if(input[0] == 'r' || input[0] == 'R') {
+    for(int j = 0; j < 8; j++) {
+      if(input[j] == '.') {
+        j = 8;
+      }
+      else if(47 < input[j] && input[j] < 58) {
+        numero = numero * 10 + (input[j] - '0');
+      }
+    }
+    if(5 <= numero) Ref_dist = numero;
   }
-  return numero;
+  if(input[0] == 'm' || input[0] == 'M') {
+    for(int j = 0; j < 8; j++) {
+      if(input[j] == '.') {
+        j = 8;
+      }
+      else if(47 < input[j] && input[j] < 58) {
+        numero = numero * 10 + (input[j] - '0');
+      }
+    }
+    Modo = numero;
+  }
+  for(int j = 0; j < 8; j++)
+    input[j] = '.';
 }
 
 void loop() {
@@ -136,16 +154,12 @@ void loop() {
   elapsedTime = (tiempo - timePrev) / 1000;
 
   if (Serial.available()) {
-    input = Serial.read();
-    if(input == 'm' || input == 'M') {
-      while(!(Serial.available()));
-        input = leer_numero();
-        if(0 <= input && input <= 4)  Modo = input;
+    input[i] = Serial.read();
+    if(input[i] == '.') {
+      leer_comando();
+      i = 0;
     }
-    if(input == 'r' || input == 'R') {
-      while(!(Serial.available()));
-      Ref_dist = leer_numero();        
-    }
+    else i ++;    
   }
 
   // Lectura de los ultrasonidos
@@ -170,9 +184,6 @@ void loop() {
 
   switch(Modo){
     case 0:
-      u_D = 0;
-      u_I = 0;
-
       digitalWrite(IN3, LOW);
       digitalWrite(IN4, LOW);
     
@@ -291,7 +302,13 @@ void loop() {
     case 4:
       break;
       
-    default: break;
+    default: 
+      digitalWrite(IN3, LOW);
+      digitalWrite(IN4, LOW);
+    
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, LOW);
+      break;
   }
 
   Serial.print(elapsedTime * 1000);
