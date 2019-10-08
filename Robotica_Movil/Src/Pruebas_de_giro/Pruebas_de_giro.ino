@@ -231,15 +231,9 @@ void loop() {
       break;
       
     case 1:
-      D = (DD + DI)/2;
-      prev_error_dist = error_dist;
-      error_dist = D - Ref_dist;
-      int_error_dist += elapsedTime * error_dist;
-      u_dist = Kp_dist_1 * error_dist + Ki_dist_1 * int_error_dist + Kd_dist_1 * (error_dist - prev_error_dist) / elapsedTime;
-    
-      u_D = u_dist;
-      u_I = u_dist;
-
+      u_D = 100;
+      u_I = 0;
+      
       if(u_D == 0) {
         digitalWrite(IN3, LOW);
         digitalWrite(IN4, LOW);
@@ -265,36 +259,14 @@ void loop() {
         digitalWrite(IN1, LOW);
         digitalWrite(IN2, HIGH);
       }
-    
-      // Anti-windup
-      if (u_dist < -255 || 255 < u_dist)  int_error_dist -= elapsedTime * error_dist;
-    
-      // Saturaciones
-      if (u_D > 255)  u_D = 255;
-      else if (u_D < - 255) u_D = - 255;
-      if (u_I > 255)  u_I = 255;
-      else if (u_I < - 255) u_I = - 255;
-      
       analogWrite(END, abs(u_D));
       analogWrite(ENI, abs(u_I));
       break;
       
     case 2:
-      D = (DD + DI)/2;
-      prev_error_dist = error_dist;
-      error_dist = D - Ref_dist;
-      int_error_dist += elapsedTime * error_dist;
-      u_dist = Kp_dist_2 * error_dist + Ki_dist_2 * int_error_dist + Kd_dist_2 * (error_dist - prev_error_dist) / elapsedTime;
-    
-      D_dif = DD - DI;
-      prev_error_dif = error_dif;
-      error_dif = Ref_dif - D_dif;
-      int_error_dif += elapsedTime * error_dif;
-      u_dif = Kp_dif_2 * error_dif + Ki_dif_2 * int_error_dif + Kd_dif_2 * (error_dif - prev_error_dif) / elapsedTime;
-    
-      u_D = (u_dist - u_dif/2);
-      u_I = (u_dist + u_dif/2);
-    
+      u_D = 0;
+      u_I = 100;
+      
       if(u_D == 0) {
         digitalWrite(IN3, LOW);
         digitalWrite(IN4, LOW);
@@ -320,29 +292,13 @@ void loop() {
         digitalWrite(IN1, LOW);
         digitalWrite(IN2, HIGH);
       }
-    
-      // Anti-windup
-      if (u_dist < -255 || 255 < u_dist)  int_error_dist -= elapsedTime * error_dist;
-      if (u_dif < -255 || 255 < u_dif)  int_error_dif -= elapsedTime * error_dif;
-    
-      // Saturaciones
-      if (u_D > 255)  u_D = 255;
-      else if (u_D < - 255) u_D = - 255;
-      if (u_I > 255)  u_I = 255;
-      else if (u_I < - 255) u_I = - 255;
       
       analogWrite(END, abs(u_D));
       analogWrite(ENI, abs(u_I));
       break;
     case 3:
-      break;
-      
-    case 4:
-      break;
-      
-    default: 
-      u_D = 0;
-      u_I = 0;
+      u_D = 50;
+      u_I = -50;
       
       digitalWrite(IN3, LOW);
       digitalWrite(IN4, LOW);
@@ -353,46 +309,42 @@ void loop() {
       analogWrite(END, abs(u_D));
       analogWrite(ENI, abs(u_I));
       break;
+      
+    case 4:
+      u_D = -50;
+      u_I = 50;
+      
+      if(u_D == 0) {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, LOW);
+      }
+      else if (u_D > 0) {
+        digitalWrite(IN3, HIGH);
+        digitalWrite(IN4, LOW);
+      }
+      else {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, HIGH);
+      }
+      
+      if(u_I == 0) {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, LOW);
+      }
+      else if (u_I > 0) {
+        digitalWrite(IN1, HIGH);
+        digitalWrite(IN2, LOW);
+      }
+      else {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, HIGH);
+      }
+      
+      analogWrite(END, abs(u_D));
+      analogWrite(ENI, abs(u_I));
+      break;
+      
+    default: 
+      break;
   }
-
-  // 1
-  Serial.print(elapsedTime * 1000);
-  Serial.print(" ");
-
-  // 2
-  Serial.print(DI);
-  Serial.print(" ");
-
-  // 3
-  Serial.print(DD);
-  Serial.print(" ");
-
-  // 4
-  Serial.print(Ref_dist);
-  Serial.print(" ");
-
-  // 5
-  Serial.print(Modo);
-  Serial.print(" ");
-
-  // 6
-  Serial.print(u_I);
-  Serial.print(" ");
-
-  //Serial.println(u_D);
-
-  // 7
-  Serial.print(u_D);
-  Serial.print(" ");
-
-  // 8
-  Serial.print(D);
-  Serial.print(" ");
-
-  // 9
-  Serial.print(D_dif);
-  Serial.print(" ");
-
-  // 10
-  Serial.println(Ref_dif);
 }
