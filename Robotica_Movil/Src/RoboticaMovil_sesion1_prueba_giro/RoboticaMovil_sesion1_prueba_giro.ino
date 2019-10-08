@@ -58,16 +58,16 @@ int Ref_dif = 0;
   // Control de distancia
   double Kp_dist_1 = 10;
   double Kd_dist_1 = 2;
-  double Ki_dist_1 = 3;
+  double Ki_dist_1 = 7;
 
 //Modo 2
   // Control de distancia
-  double Kp_dist_2 = 10;
-  double Kd_dist_2 = 2;
-  double Ki_dist_2 = 3;
+  double Kp_dist_2 = 0;
+  double Kd_dist_2 = 0;
+  double Ki_dist_2 = 0;
 
   // Control de angulo
-  double Kp_dif_2 = 15;
+  double Kp_dif_2 = 60;
   double Kd_dif_2 = 0;
   double Ki_dif_2 = 0;
 
@@ -254,8 +254,8 @@ void loop() {
       int_error_dif += elapsedTime * error_dif;
       u_dif = Kp_dif_2 * error_dif + Ki_dif_2 * int_error_dif + Kd_dif_2 * (error_dif - prev_error_dif) / elapsedTime;
     
-      u_D = (u_dist + u_dif/2);
-      u_I = (u_dist - u_dif/2);
+      u_D = (u_dist - u_dif/2);
+      u_I = (u_dist + u_dif/2);
     
       if(u_D == 0) {
         digitalWrite(IN3, LOW);
@@ -311,23 +311,44 @@ void loop() {
       break;
   }
 
+  // 1
   Serial.print(elapsedTime * 1000);
   Serial.print(" ");
-  
+
+  // 2
   Serial.print(DI);
   Serial.print(" ");
 
+  // 3
   Serial.print(DD);
   Serial.print(" ");
 
+  // 4
   Serial.print(Ref_dist);
   Serial.print(" ");
 
+  // 5
   Serial.print(Modo);
   Serial.print(" ");
 
+  // 6
   Serial.print(u_I);
   Serial.print(" ");
 
-  Serial.println(u_D);
+  //Serial.println(u_D);
+
+  // 7
+  Serial.print(u_D);
+  Serial.print(" ");
+
+  // 8
+  Serial.print(D);
+  Serial.print(" ");
+
+  // 9
+  Serial.print(D_dif);
+  Serial.print(" ");
+
+  // 10
+  Serial.println(Ref_dif);
 }
