@@ -1,0 +1,103 @@
+4a5,8
+> $l  4 I    E2V2  1
+> $v  5 CERRA 0
+> $v  6 POSIN 0
+> $v  7 NEXTP 0
+10,11c14,15
+< $p  6  1 NEXT -3453  10778 -12284 -388  855 0
+< $p  7  1 APROX -3453  9531 -11643 -389  852 0
+---
+> $p  6  1 NEXT -3622  14320 -8196  517  1651 0
+> $p  7  1 APROX -3621  13122 -8221  515  1648 0
+32a37,38
+> $p  29  1 PI -11295  10922 -4963  50  1180 0
+> $p  30  1 NEXTP -3453  11696 -12615 -385  859 0
+36a43,47
+> $pr  4 SETUP
+> $pr  5 EMERG
+> $pr  6 E2V1
+> $pr  7 E2V2
+> $pr  8 EMER1
+134c145
+< MOVE      APROX 
+---
+> MOVED     APROX 
+138c149
+< MOVE      APROX 
+---
+> MOVED     APROX 
+141a153,226
+> 
+>                 PROGRAM   SETUP
+>                 *********************
+> 
+> SPEED     30
+> MOVED     P0 
+> WAIT      IN[2] = 1
+> TRIGGER   E2V2 BY  IN 2 1
+> TRIGGER   EMER1 BY  IN 2 0
+> END       
+> 
+>                 PROGRAM   EMERG
+>                 *********************
+> 
+> STOP      E2V2
+> STOP      E2V2
+> IF        CERRA = 1
+>   END       
+> 
+>                 PROGRAM   E2V1
+>                 *********************
+> 
+>   END       
+> 
+>                 PROGRAM   E2V2
+>                 *********************
+> 
+>   MOVE      P0 
+>   OPEN      
+>   FOR       I = 1 TO 3
+>     SETP      NEXT=P[I]
+>     GOSUB     APROX
+>     CLOSE     
+>     SET       CERRA = 1
+>     SETP      NEXT=T[I]
+>     GOSUB     APROX
+>     OPEN      
+>     SET       CERRA = 0
+>   ENDFOR
+>   MOVE      P0 
+>   END       
+> 
+>                 PROGRAM   EMER1
+>                 *********************
+> 
+>   SUSPEND   E2V2
+>   IF        CERRA = 1
+>     MOVED     P0 
+>     SETP      NEXTP=NEXT
+>     SETP      NEXT=PI
+>     GOSUB     APROX
+>     OPEN      
+>     SETP      NEXT=NEXTP
+>     SET       POSIN = 1
+>     SET       CERRA = 0
+>   ELSE
+>     SET       POSIN = 0
+>     SET       CERRA = 0
+>   ENDIF
+>   MOVED     P0 
+>   WAIT      IN[2] = 1
+>   IF        POSIN = 1
+>     SETP      NEXTP=NEXT
+>     SETP      NEXT=PI
+>     MOVED     P0 
+>     GOSUB     APROX
+>     CLOSE     
+>     SETP      NEXT=NEXTP
+>     SET       CERRA = 1
+>     MOVED     P0 
+>     SET       POSIN = 0
+>   ENDIF
+>   CONTINUE  E2V2
+>   END       
