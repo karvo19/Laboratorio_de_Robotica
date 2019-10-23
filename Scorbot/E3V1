@@ -1,0 +1,91 @@
+*************** E3P1 *******************
+WAIT IN[2] = 1
+SET T_INI = TIME
+WAIT IN[2] = 0
+SET T_FIN = TIME
+SET TP1A = T_FIN - T_INI
+POST TP1A TO TP1
+
+
+*************** E3P2 *******************
+SET TP1 = 0
+SPEED 30
+MOVED POS1
+PEND T FROM TP1
+IF T > 300
+	MOVED POS2 T
+	MOVED POS1 T
+ENDIF
+
+
+*************** E3V1 *******************
+RUN E3P1
+RUN E3P2
+
+
+
+****************************************
+****************************************
+****************************************
+****************************************
+
+
+
+
+
+*************** E4P1 *******************
+* ESTE PROGRAMA ESPERA A VALORES DE LA COLA 
+* Y CUANDO LOS HAYA EJECUTA LOS MOVS
+DEFINE P_E4
+LABEL 1
+QPEND P_E4 FROM QUEUE
+OPEN
+IF P_E4 = 1
+	SETP PNEXT = P[1]
+ENDIF
+IF P_E4 = 2
+	SETP PNEXT = P[2]
+ENDIF
+IF P_E4 = 3
+	SETP PNEXT = P[3]
+ENDIF
+GOSUB APROX
+CLOSE
+SHIFTC PNEXT BY Z 2000
+MOVED PNEXT
+SHIFTC PNEXT BY Z -2000
+GOSUB APROX
+OPEN
+MOVED P0
+GOTO 1
+END
+
+*************** E4P2 *******************
+* ESTE MANDA A LA COLA LA PIEZA 1 CUANDO
+* SE PULSE UN INTERRUPTOR EXTERNO
+LABEL 2
+WAIT IN[2] = 1
+QPOST 1 TO QUEUE
+WAIT IN[2] = 0
+GOTO 2
+
+*************** E4P3 *******************
+* MANDA A LA COLA LO QUE ESCRIBES POR TECLADO
+
+
+*************** E4P4 *******************
+* IMPRIME POR PANTALLA EL CONTENIDO DE LA
+* COLA CADA 5 SEGUNDOS
+
+
+*************** E4V1 *******************
+DIMG QUEUE[10]
+DEFINE I
+FOR I = 1 TO 10
+	SET QUEUE[I] = 0
+ENDFOR
+MOVED P0
+RUN E4P1
+RUN E4P2
+RUN E4P3
+RUN E4P4
