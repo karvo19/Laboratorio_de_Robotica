@@ -1,14 +1,19 @@
 
-**Linea en blanco y luego como los prototipos de las funciones con $l delante y un numero detras que no se que es
 $l  1 I    E1V0  3
 $l  2 J    E1V0  600
 $l  3 I    E1V1  3
 $l  4 I    E2V2  1
-** Variables tipo var seguidas de un numero (valor?)
-$v  5 CERRA 0
-$v  6 POSIN 0
-$v  7 NEXTP 0
-** Ahora se reinicia el indice de linea y vienen todas las variables de posicion guardadas
+$l  5 I    E3P1  1
+$l  6 I    E3P2  1
+$l  7 I    E3V1  1
+$l  8 I    E4P1  1
+$l  9 I    E4P2  1
+$l  10 I    E4P3  1
+$l  11 I    E4P4  1
+$l  12 I    E4V1  1
+$v  13 CERRA 0
+$v  14 POSIN 0
+$v  15 NEXTP 0
 $p  1  1 0 0 0 0 0 0 0
 $p  2  1 P3 -1074  14320 -8184 -361  867 0
 $p  3  1 P1 -3622  14320 -8196  517  1651 0
@@ -40,7 +45,6 @@ $p  28  1 T -3453  10778 -12284 -388  855 0
 $p  29  1 PI -11295  10922 -4963  50  1180 0
 $p  30  1 NEXTP -3453  11696 -12615 -385  859 0
 $p  1  2 00 0 0 0 0 0 0
-** Programas
 $pr  1 E1V0
 $pr  2 E1V1
 $pr  3 APROX
@@ -49,7 +53,14 @@ $pr  5 EMERG
 $pr  6 E2V1
 $pr  7 E2V2
 $pr  8 EMER1
-** Esto de abajo no hay que cambiarlo
+$pr  9 E3P1
+$pr  10 E3P2
+$pr  11 E3V1
+$pr  12 E4P1
+$pr  13 E4P2
+$pr  14 E4P3
+$pr  15 E4P4
+$pr  16 E4V1
 $par  1 -400  120  333 0 0  50  12  30
 $par  9 0  44 0 0 0 0 0 0
 $par  17 0 0 0 0  200  200  200  250
@@ -229,4 +240,71 @@ IF        CERRA = 1
   ENDIF
   CONTINUE  E2V2
   END       
+
+                PROGRAM   E3P1
+                *********************
+
+WAIT IN[2] = 1
+SET T_INI = TIME
+WAIT IN[2] = 0
+SET T_FIN = TIME
+SET TP1A = T_FIN - T_INI
+POST TP1A TO TP1
+
+                PROGRAM   E3P2
+                *********************
+
+SET TP1 = 0
+SPEED 30
+MOVED POS1
+PEND T FROM TP1
+IF T > 300
+  MOVED POS2 T
+  MOVED POS1 T
+ENDIF
+
+                PROGRAM   E3V1
+                *********************
+
+RUN E3P1
+RUN E3P2
+
+                PROGRAM   E4P1
+                *********************
+
+DEFINE P_E4
+LABEL 1
+QPEND P_E4 FROM QUEUE
+OPEN
+IF P_E4 = 1
+        SETP PNEXT = P[1]
+ENDIF
+IF P_E4 = 2
+        SETP PNEXT = P[2]
+ENDIF
+IF P_E4 = 3
+        SETP PNEXT = P[3]
+ENDIF
+GOSUB APROX
+CLOSE
+SHIFTC PNEXT BY Z 2000
+MOVED PNEXT
+SHIFTC PNEXT BY Z -2000
+GOSUB APROX
+OPEN
+MOVED P0
+GOTO 1
+END
+
+                PROGRAM   E4P2
+                *********************
+
+                PROGRAM   E4P3
+                *********************
+
+                PROGRAM   E4P4
+                *********************
+
+                PROGRAM   E4V1
+                *********************
 (END)
