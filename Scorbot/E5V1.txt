@@ -1,0 +1,28 @@
+> DIMP TRAY[5]
+> HERE TRAY[1]
+> RUN E5P1
+
+        E5P1
+********************
+DEFINE I
+DEFINE J
+FOR I = 1 TO 4
+    SET J = I + 1
+    NEXT = TRAY[I]
+    SHIFTC NEXT BY X 100
+    SHIFTC NEXT BY Y 200
+    SHIFTC NEXT BY Z 50
+    SETP TRAY[J]= NEXT
+ENDFOR
+END
+
+        E5V1
+********************
+MOVED TRAY[1]
+LABEL 5
+WAIT IN[2] = 1
+MODESD TRAY 2 5
+WAIT IN[2] = 0
+MOVESD TRAY 4 1
+GOTO 5
+END
