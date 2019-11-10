@@ -1,0 +1,546 @@
+
+$l  1 I    E1V0  3
+$l  2 J    E1V0  600
+$l  3 I    E1V1  3
+$l  4 I    E2V2  3
+$v  5 CERRA 0
+$v  6 POSIN 0
+$v  7 NEXTP 0
+$v  8 MOV 0
+$v  9 T_INI  148386
+$v  10 T_FIN  148890
+$v  11 TP1A  504
+$v  12 T  504
+$v  13 TP1 0
+$v  14 $%^&$%^&  11
+$v  15 QUEUE  262148
+$v  16 QUEUE  1
+$v  17 QUEUE  1
+$v  18 QUEUE  1
+$v  19 QUEUE  1
+$v  20 QUEUE  1
+$v  21 QUEUE  1
+$v  22 QUEUE  2
+$v  23 QUEUE  3
+$v  24 QUEUE  1
+$l  25 P_E4 E4P1  3
+$l  26 VAR  E4P3  2
+$l  27 I    E4P4  10
+$v  28 J 0
+$l  29 I    E4V1  10
+$l  30 I    E5P1  4
+$l  31 J    E5P1  5
+$l  32 I    E7V1 0
+$v  33 APIL 0
+$l  34 I    PRS2  1000
+$p  1  1 0 0 0 0 0 0 0
+$p  2  1 P3 -1074  14320 -8184 -361  867 0
+$p  3  1 P1 -3622  14320 -8196  517  1651 0
+$p  4  1 P2 -5521  15005 -7248  1707  2842 0
+$p  5  1 T1 -3453  12596 -12821 -385  861 0
+$p  6  1 NEXT -3621  11614 -7806  515  1648 0
+$p  7  1 APROX -3620  9969 -6690  513  1646 0
+$p  8  1 P0 -3453  2205 -1520  577 -99 0
+$p  9  1 P1A -3624  12861 -8216  513  1643 0
+$p  10  1 P2A -5531  13580 -7532  1707  2839 0
+$p  11  1 P3A -1075  13201 -8216 -361  864 0
+$p  12  1 $%^&$  7  6025 -3822 -2 0 0
+$p  13  1 POS -3624  12861 -8216  513  1643 0
+$p  14  1 POS -5531  13580 -7532  1707  2839 0
+$p  15  1 POS -1075  13201 -8216 -361  864 0
+$p  16  1 POS -3622  14320 -8196  517  1651 0
+$p  17  1 POS -5521  15005 -7248  1707  2842 0
+$p  18  1 POS -1074  14320 -8184 -361  867 0
+$p  19  1 $%^&$  4  6810 -5342 -340  333 0
+$p  20  1 P -3622  14320 -8196  517  1651 0
+$p  21  1 P -5521  15005 -7248  1707  2842 0
+$p  22  1 P -1074  14320 -8184 -361  867 0
+$p  23  1 T2 -3453  11696 -12615 -385  859 0
+$p  24  1 T3 -3453  10778 -12284 -388  855 0
+$p  25  1 $%^&$  4  13107 -9041 -203  71 0
+$p  26  1 T -3453  12596 -12821 -385  861 0
+$p  27  1 T -3453  11696 -12615 -385  859 0
+$p  28  1 T -3453  10778 -12284 -388  855 0
+$p  29  1 PI -11295  10922 -4963  50  1180 0
+$p  30  1 NEXTP -3453  11696 -12615 -385  859 0
+$p  31  1 POS1 -46  13399 -9578 -855  485 0
+$p  32  1 POS2 -4239  12770 -11160 -299  1037 0
+$p  33  1 APTEA 0 0  1000 0 0 -3
+$p  34  1 BREL 0 0 -1000 0 0 -32767
+$p  35  1 SREL 0 0  1000 0 0 -32767
+$p  36  1 G10  1418 0 0 0 0  32767
+$p  37  1 C1  32767 0 0 0 0 0
+$p  38  1 $%^&$  6  8765 -6054 -102  264 0
+$p  39  1 TRAY -3482  5644 -8100 -458  918 0
+$p  40  1 TRAY -4941  5234 -7449 -463  909 0
+$p  41  1 TRAY -6331  5080 -6748 -469  898 0
+$p  42  1 TRAY -7587  5189 -6014 -475  888 0
+$p  43  1 TRAY -8678  5540 -5240 -482  878 0
+$p  44  1 PICIN -14547  8468 -7358  1231  2610 0
+$p  45  1 PCS1  32767 0 0 0 0 0
+$p  46  1 PS -13164  9488 -6376 -1433 -55 0
+$p  1  2 00 0 0 0 0 0 0
+$p  2  2 C2  12628 0 -1 -1 -1 0
+$p  3  2 C3  14089 0 -1 -1 -1 0
+$pr  1 E1V0
+$pr  2 E1V1
+$pr  3 APROX
+$pr  4 SETUP
+$pr  5 EMERG
+$pr  6 E2V1
+$pr  7 E2V2
+$pr  8 EMER1
+$pr  9 E3P1
+$pr  10 E3P2
+$pr  11 E3V1
+$pr  12 E4P1
+$pr  13 E4P2
+$pr  14 E4P3
+$pr  15 E4P4
+$pr  16 E4V1
+$pr  17 APROR
+$pr  18 E6
+$pr  19 E5P1
+$pr  20 E5V1
+$pr  21 E7V1
+$pr  22 PRV1
+$pr  23 PRS1
+$pr  24 PRS2
+$par  1 -400  120  333 0 0  50  12  30
+$par  9 0  44 0 0 0 0 0 0
+$par  17 0 0 0 0  200  200  200  250
+$par  25  250  180  700  700  700  700  700 0
+$par  33  12770 -10216  10216  5022  5022 0 0 0
+$par  41  250  250  250  300  300  500  500  500
+$par  49  500  500  500 0  13653 -2867  1773 0
+$par  57 0 0 0 0  1000  2500  2500  1200
+$par  65  1200  1500  1200  1200  1200  1200  1200  1
+$par  73  5400 0  3500  5 0  1  2 0
+$par  81 0 0 0 0 0 0 0 0
+$par  89 0 0 0 0  160  3490  2210  2210
+$par  97  1450 0 0 0  24330  17160  21000  16000
+$par  105  16000  32767  32767  32767  32767  32767  32767 0
+$par  113 0 0 0 0 0 0 0 0
+$par  121 -18830 -400 -32000 -16000 -16000 -32768 -32768 -32768
+$par  129 -32768 -32768 -32768 0 0 0 0 0
+$par  137 0 0 0 0  3000  3000  3000  3000
+$par  145  3000  3000  16000  16000  16000  16000  16000 0
+$par  153 0 0 0 0 0 0 0 0
+$par  161  4500  4500  4500  4500  4500  4900  4500  4500
+$par  169  4500  4500  4500 0 0 0 0 0
+$par  177 0 0 0 0  5  5  3  5
+$par  185  5  25  10  10  10  10  10 0
+$par  193 0 0 0 0 0 0 0 0
+$par  201  4500  4000  4000  4000  4000  4000  3000  3000
+$par  209  3000  3000  3000 0 0 0 0 0
+$par  217 0 0 0 0  4500  6000  6000  3000
+$par  225  3000  6000  3000  3000  3000  3000  3000 0
+$par  233 0 0 0 0 0 0 0 0
+$par  241  24  24  30  24  24  12  5  5
+$par  249  5  5  5 0 0 0 0 0
+$par  257 0 0 0 0  20  20  20  20
+$par  265  20  10  10  10  10  10  10  1
+$par  273 0 0 0 0 0 0 0 0
+$par  281  4600  4600  4000  4600  4600  4900  4000  4000
+$par  289  4000  4000  4000 0 0  8000  50  40
+$par  297  50  30  660  15 0 0 0 0
+$par  305 0 0 0 0 0 0 0
+
+                PROGRAM   E1V0
+                *********************
+
+SETP      POS[1]=P1A
+SETP      POS[2]=P2A
+SETP      POS[3]=P3A
+SETP      POS[4]=P1
+SETP      POS[5]=P2
+SETP      POS[6]=P3
+OPEN      
+SPEED     30
+MOVED     P0 
+FOR       I = 1 TO 3
+  MOVED     POS[I] 
+  SPEED     10
+  SET       J=I + 3
+  MOVED     POS[J] 
+  CLOSE     
+  MOVED     POS[I] 
+  SPEED     30
+  SET       J=I - 1
+  SET       J=J * 300
+  SETP      NEXT=T1
+  SHIFTC    NEXT BY Z  J
+  SETP      APROX=NEXT
+  SHIFTC    APROX BY Z  600
+  MOVED     APROX 
+  SPEED     10
+  MOVED     NEXT 
+  OPEN      
+  MOVED     APROX 
+  SPEED     30
+ENDFOR
+MOVED     P0 
+END       
+
+                PROGRAM   E1V1
+                *********************
+
+MOVE      P0 
+FOR       I = 1 TO 3
+  SETP      NEXT=P[I]
+  GOSUB     APROX
+  CLOSE     
+  SETP      NEXT=T[I]
+  GOSUB     APROX
+  OPEN      
+ENDFOR
+MOVE      P0 
+END       
+
+                PROGRAM   APROX
+                *********************
+
+SET       MOV = 1
+SPEED     10
+HERE      APROX
+SHIFTC    APROX BY Z  800
+MOVED     APROX 
+SPEED     30
+SETP      APROX=NEXT
+SHIFTC    APROX BY Z  800
+MOVED     APROX 
+SPEED     10
+MOVED     NEXT 
+SET       MOV = 0
+END       
+
+                PROGRAM   SETUP
+                *********************
+
+SPEED     30
+WAIT      IN[2] = 1
+RUN       E2V2
+TRIGGER   EMER1 BY  IN 2 0
+END       
+
+                PROGRAM   EMERG
+                *********************
+
+STOP      E2V2
+STOP      E2V2
+IF        CERRA = 1
+  END       
+
+                PROGRAM   E2V1
+                *********************
+
+  END       
+
+                PROGRAM   E2V2
+                *********************
+
+  MOVE      P0 
+  OPEN      
+  FOR       I = 1 TO 3
+    SETP      NEXT=P[I]
+    GOSUB     APROX
+    CLOSE     
+    SET       CERRA = 1
+    SETP      NEXT=T[I]
+    GOSUB     APROX
+    OPEN      
+    SET       CERRA = 0
+  ENDFOR
+  MOVE      P0 
+  END       
+
+                PROGRAM   EMER1
+                *********************
+
+  SUSPEND   E2V2
+  CLRBUF   
+  IF        CERRA = 1
+    MOVED     P0 
+    SETP      NEXTP=NEXT
+    SETP      NEXT=PI
+    GOSUB     APROX
+    OPEN      
+    SETP      NEXT=NEXTP
+    SET       POSIN = 1
+    SET       CERRA = 0
+  ELSE
+    SET       POSIN = 0
+    SET       CERRA = 0
+  ENDIF
+  MOVED     P0 
+  WAIT      IN[2] = 1
+  IF        POSIN = 1
+    SETP      NEXTP=NEXT
+    SETP      NEXT=PI
+    MOVED     P0 
+    GOSUB     APROX
+    CLOSE     
+    SETP      NEXT=NEXTP
+    SET       CERRA = 1
+    MOVED     P0 
+    SET       POSIN = 0
+  ENDIF
+  IF        MOV = 1
+    GOSUB     APROX
+  ENDIF
+  TRIGGER   EMER1 BY  IN 2 0
+  CONTINUE  E2V2
+  END       
+
+                PROGRAM   E3P1
+                *********************
+
+  WAIT      IN[2] = 1
+  SET       T_INI = TIME
+  WAIT      IN[2] = 0
+  SET       T_FIN = TIME
+  SET       TP1A=T_FIN - T_INI
+  POST      TP1A TO TP1
+  END       
+
+                PROGRAM   E3P2
+                *********************
+
+  SET       TP1 = 0
+  SPEED     30
+  MOVED     POS1 
+  PEND      T FROM TP1
+  IF        T > 300
+    MOVED     POS2 T
+    MOVED     POS1 T
+  ENDIF
+  END       
+
+                PROGRAM   E3V1
+                *********************
+
+  RUN       E3P1
+  RUN       E3P2
+  END       
+
+                PROGRAM   E4P1
+                *********************
+
+  LABEL     1
+  QPEND     P_E4 FROM QUEUE
+  OPEN      
+  IF        P_E4 = 1
+    SETP      NEXT=P[1]
+  ENDIF
+  IF        P_E4 = 2
+    SETP      NEXT=P[2]
+  ENDIF
+  IF        P_E4 = 3
+    SETP      NEXT=P[3]
+  ENDIF
+  GOSUB     APROX
+  CLOSE     
+  SHIFTC    NEXT BY Z  2000
+  MOVED     NEXT 
+  SHIFTC    NEXT BY Z  -2000
+  MOVED     NEXT 
+  OPEN      
+  MOVED     P0 
+  GOTO      1
+  END       
+
+                PROGRAM   E4P2
+                *********************
+
+  LABEL     2
+  WAIT      IN[2] = 1
+  QPOST     1 TO QUEUE
+  WAIT      IN[2] = 0
+  GOTO      2
+  END       
+
+                PROGRAM   E4P3
+                *********************
+
+  LABEL     3
+  PRINTLN   "INTRODUZCA VALOR DE 1 A 3"
+  READ       VAR
+  IF        VAR > 3
+    GOTO      3
+  ENDIF
+  QPOST     VAR TO QUEUE
+  GOTO      3
+  END       
+
+                PROGRAM   E4P4
+                *********************
+
+  LABEL     4
+  FOR       I = 1 TO 10
+    IF        QUEUE[I] <> 0
+      PRINTLN   "EL "  I" VALOR ES "  QUEUE[I]
+    ENDIF
+  ENDFOR
+  PRINTLN   " "
+  DELAY     500
+  GOTO      4
+  END       
+
+                PROGRAM   E4V1
+                *********************
+
+  FOR       I = 1 TO 10
+    SET       QUEUE[I] = 0
+  ENDFOR
+  RUN       E4P1
+  RUN       E4P2
+  RUN       E4P3
+  RUN       E4P4
+  END       
+
+                PROGRAM   APROR
+                *********************
+
+  END       
+
+                PROGRAM   E6
+                *********************
+
+  SPEED     30
+  MOVED     P0 
+  OPEN      
+  MOVED     APTEA 
+  SPEED     10
+  MOVELD    P1 
+  CLOSE     
+  MOVELD    SREL 
+  SPEED     30
+  FOR       J = 0 TO 4
+    MOVED     G10 
+  ENDFOR
+  SPEED     10
+  MOVELD    BREL 
+  OPEN      
+  MOVELD    SREL 
+  SPEED     30
+  MOVED     P0 
+  END       
+
+                PROGRAM   E5P1
+                *********************
+
+  FOR       I = 1 TO 4
+    SET       J=I + 1
+    SETP      NEXT=TRAY[I]
+    SHIFTC    NEXT BY X  -200
+    SHIFTC    NEXT BY Y  -400
+    SHIFTC    NEXT BY Z  200
+    SETP      TRAY[J]=NEXT
+  ENDFOR
+  END       
+
+                PROGRAM   E5V1
+                *********************
+
+  MOVED     TRAY[1] 
+  LABEL     5
+  WAIT      IN[2] = 1
+  MOVESD    TRAY 2 5
+  WAIT      IN[2] = 0
+  MOVESD    TRAY 4 1
+  GOTO      5
+  END       
+
+                PROGRAM   E7V1
+                *********************
+
+  SPEED     30
+  MOVED     P0 
+  SETP      NEXT=P1
+  OPEN      
+  GOSUB     APROX
+  CLOSE     
+  MOVED     P0 
+  SETP      NEXT=PICIN
+  GOSUB     APROX
+  OPEN      
+  MOVELD    SREL 
+  FOR       J = 1 TO 20
+    SET       I=100 * J
+    SET       ANOUT[7] =-I
+    DELAY     5
+  ENDFOR
+  DELAY     140
+  FOR       J = 20 TO 0
+    SET       I=100 * J
+    SET       ANOUT[7] =-I
+    DELAY     5
+  ENDFOR
+  FOR       J = 1 TO 20
+    SET       I=100 * J
+    SET       ANOUT[7] = I
+    DELAY     5
+  ENDFOR
+  DELAY     100
+  FOR       J = 20 TO 0
+    SET       I=100 * J
+    SET       ANOUT[7] = I
+    DELAY     5
+  ENDFOR
+  MOVELD    BREL 
+  CLOSE     
+  MOVELD    SREL 
+  MOVED     P0 
+  SETP      NEXT=P1
+  GOSUB     APROX
+  OPEN      
+  MOVED     P0 
+  END       
+
+                PROGRAM   PRV1
+                *********************
+
+  SET       APIL = 0
+  LABEL     2
+  SET       OUT[15] = 1
+  DELAY     40
+  SET       OUT[15] = 0
+  SPEED     40
+  MOVED     P0 
+  WAIT      IN[5] = 1
+  GOSUB     PRS1
+  GOSUB     PRS2
+  SET       APIL=APIL + 1
+  IF        APIL < 3
+    GOTO      2
+  ENDIF
+  IF        APIL = 3
+    SET       APIL = 0
+  ENDIF
+  END       
+
+                PROGRAM   PRS1
+                *********************
+
+  SET       ANOUT[7] = 1200
+  WAIT      IN[10] = 1
+  SET       ANOUT[7] = 0
+  END       
+
+                PROGRAM   PRS2
+                *********************
+
+  OPEN      
+  SETP      NEXT=PS
+  GOSUB     APROX
+  CLOSE     
+  MOVED     P0 
+  SET       I=APIL * 500
+  SETP      NEXT=P1
+  SHIFTC    NEXT BY Z  I
+  GOSUB     APROX
+  OPEN      
+  MOVED     SREL 
+  MOVED     P0 
+  END       
+(END)
