@@ -25,38 +25,38 @@ for i=2:muestras
     tiempo(i)=tiempo(i-1)+tel(i,1);
 end    
 
-
-figure(3);
-subplot(2,1,1);
-plot(tiempo,tel(:,2), tiempo,tel(:,3), tiempo,tel(:,4));
-xlabel('Tiempo (ms)');
-title('Sensores');
-
-subplot(2,1,2);
-plot(tiempo,tel(:,5), tiempo,tel(:,6), tiempo,tel(:,7));
-title('Actuadores');
-xlabel('Tiempo (ms)');
-
 figure(1);
-subplot(2,1,1);
-plot(tiempo,tel(:,8), 'b', tiempo,tel(:,4), 'r');
-xlabel('Tiempo (ms)');
-title('Control en distancia');
+    subplot(2,1,1);
+    plot(tiempo,tel(:,8), 'b', tiempo,tel(:,4), 'r');
+    xlabel('Tiempo (ms)');
+    title('Control en distancia');
 
-subplot(2,1,2);
-plot(tiempo,tel(:,5), 'k', tiempo,tel(:,6), 'r', tiempo,tel(:,7), 'b');
-title('Actuadores');
-xlabel('Tiempo (ms)');
+    subplot(2,1,2);
+    plot(tiempo,tel(:,5), 'k', tiempo,tel(:,6), 'r', tiempo,tel(:,7), 'b');
+    title('Actuadores');
+    xlabel('Tiempo (ms)');
+    ylabel('Señal de control ()');
 
 figure(2);
-subplot(2,1,1);
-plot(tiempo,tel(:,9), 'b', tiempo,tel(:,10), 'r');
-xlabel('Tiempo (ms)');
-title('Control de angulo');
+    subplot(2,1,1);
+    plot(tiempo,tel(:,9), 'b', tiempo,tel(:,10), 'r');
+    xlabel('Tiempo (ms)');
+    title('Control de angulo');
 
-subplot(2,1,2);
-plot(tiempo,tel(:,5), 'k', tiempo,tel(:,6), 'r', tiempo,tel(:,7), 'b');
-title('Actuadores');
-xlabel('Tiempo (ms)');
+    subplot(2,1,2);
+    plot(tiempo,tel(:,5), 'k', tiempo,tel(:,6), 'r', tiempo,tel(:,7), 'b');
+    title('Actuadores');
+    xlabel('Tiempo (ms)');
+
+figure(3);
+    subplot(2,1,1);
+    plot(tiempo,tel(:,2), tiempo,tel(:,3), tiempo,tel(:,4));
+    xlabel('Tiempo (ms)');
+    title('Sensores');
+
+    subplot(2,1,2);
+    plot(tiempo,tel(:,5), tiempo,tel(:,6), tiempo,tel(:,7));
+    title('Actuadores');
+    xlabel('Tiempo (ms)');
 
 end
