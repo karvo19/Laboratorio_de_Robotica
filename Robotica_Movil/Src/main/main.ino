@@ -203,7 +203,7 @@ void loop() {
     input[i] = Serial.read();
     if(input[i] == '.') {
       leer_comando();
-      i = 0;21
+      i = 0;
     }
     else i ++;    
   }
