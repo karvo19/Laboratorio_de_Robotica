@@ -115,10 +115,6 @@ int Ref_dif = 0;    // referencia diferencial
   double Kd_dist_aux = 0;
   double Ki_dist_aux = 0;
 
-  // Control de angulo
-  double Kp_dif_aux = 0;
-  double Kd_dif_aux = 0;
-  double Ki_dif_aux = 0;
 
 void setup() {
   // Establecemos la velocidad de comunicacion del bluetooth 
@@ -185,6 +181,7 @@ void leer_comando() {
     }
     Modo = numero;
   }
+  
   /* CAMBIO DE LAS GANANCIAS DE CONTROL: Sintaxis: "[G/g][P/p/I/i/D/d][D/d/A/a][valor]." */
   if(input[0] == 'g' || input[0] == 'G'){
     if(input[0] == 'p' || input[0] == 'P') {
@@ -197,7 +194,22 @@ void leer_comando() {
             numero = numero * 10 + (input[j] - '0');
           }
         }
-        Kp_dist_aux = numero;
+        switch(Modo){
+          case 0: break;
+          case 1:
+            Kp_dist_1 = numero;
+            break;
+          case 2:
+            Kp_dist_2 = numero;
+            break;
+          case 3:
+            Kp_dist_3 = numero;
+            break;
+          case 4:
+            Kp_dist_4 = numero;
+            break;
+          default: break;
+        }
       }
       else if(input[0] == 'a' || input[0] == 'A'){
         for(int j = 0; j < 8; j++) {
@@ -208,7 +220,20 @@ void leer_comando() {
             numero = numero * 10 + (input[j] - '0');
           }
         }
-        Kp_dif_aux = numero;
+        switch(Modo){
+          case 0: break;
+          case 1: break;
+          case 2:
+            Kp_dif_2 = numero;
+            break;
+          case 3:
+            Kp_dif_3 = numero;
+            break;
+          case 4:
+            Kp_dif_4 = numero;
+            break;
+          default: break;
+        }
       }
     }
     if(input[0] == 'i' || input[0] == 'I') {
@@ -221,7 +246,22 @@ void leer_comando() {
             numero = numero * 10 + (input[j] - '0');
           }
         }
-        Kp_dist_aux = numero;
+        switch(Modo){
+          case 0: break;
+          case 1:
+            Ki_dist_1 = numero;
+            break;
+          case 2:
+            Ki_dist_2 = numero;
+            break;
+          case 3:
+            Ki_dist_3 = numero;
+            break;
+          case 4:
+            Ki_dist_4 = numero;
+            break;
+          default: break;
+        }
       }
       else if(input[0] == 'a' || input[0] == 'A'){
         for(int j = 0; j < 8; j++) {
@@ -232,7 +272,20 @@ void leer_comando() {
             numero = numero * 10 + (input[j] - '0');
           }
         }
-        Kp_dif_aux = numero;
+        switch(Modo){
+          case 0: break;
+          case 1: break;
+          case 2:
+            Ki_dif_2 = numero;
+            break;
+          case 3:
+            Ki_dif_3 = numero;
+            break;
+          case 4:
+            Ki_dif_4 = numero;
+            break;
+          default: break;
+        }
       }
     }
     if(input[0] == 'd' || input[0] == 'D') {
@@ -245,7 +298,22 @@ void leer_comando() {
             numero = numero * 10 + (input[j] - '0');
           }
         }
-        Kp_dist_aux = numero;
+        switch(Modo){
+          case 0: break;
+          case 1:
+            Kd_dist_1 = numero;
+            break;
+          case 2:
+            Kd_dist_2 = numero;
+            break;
+          case 3:
+            Kd_dist_3 = numero;
+            break;
+          case 4:
+            Kd_dist_4 = numero;
+            break;
+          default: break;
+        }
       }
       else if(input[0] == 'a' || input[0] == 'A'){
         for(int j = 0; j < 8; j++) {
@@ -256,7 +324,20 @@ void leer_comando() {
             numero = numero * 10 + (input[j] - '0');
           }
         }
-        Kp_dif_aux = numero;
+        switch(Modo){
+          case 0: break;
+          case 1: break;
+          case 2:
+            Kd_dif_2 = numero;
+            break;
+          case 3:
+            Kd_dif_3 = numero;
+            break;
+          case 4:
+            Kd_dif_4 = numero;
+            break;
+          default: break;
+        }
       }
     }
   }
