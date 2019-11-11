@@ -53,38 +53,40 @@ int DI;  // distancia del sensor ultrasonidos izquierdo a la pared en linea rect
 // Variables para la lectura de los ultrasonidos
 float duracionD, duracionI;
 
+/* Variables para la comunicacion por bluetooth */
 char input[8];
 int i = 0;
 
+/* DESCRIPCION DE LOS MODOS DE FUNCIONAMIENTO */
 int Modo = 0;   // 0 -> parado   
                 // 1 -> control fontal
                 // 2 -> control frontal perpendicular
                 // 3 -> paralelo lateral a 50 cm
                 // 4 -> paralelo lateral con referencia ajustable
 
-// Referencias iniciales
-int Ref_dist = 30;
-int Ref_dif = 0;
+/* REFERENCIAS INICIALES */
+int Ref_dist = 30;  // referencia en distancia
+int Ref_dif = 0;    // referencia diferencial
 
-// Constantes de control
-//Modo 1
+/* GANANCIAS DE CONTROL */
+// MODO 1
   // Control de distancia
   double Kp_dist_1 = 10;
   double Kd_dist_1 = 2;
   double Ki_dist_1 = 7;
 
-//Modo 2
+// MODO 2
   // Control de distancia
   double Kp_dist_2 = 0;
   double Kd_dist_2 = 0;
   double Ki_dist_2 = 0;
 
   // Control de angulo
-  double Kp_dif_2 = 60;
-  double Kd_dif_2 = 0;
-  double Ki_dif_2 = 0;
+  double Kp_dif_2 = 80;
+  double Kd_dif_2 = 5;
+  double Ki_dif_2 = 1;
 
-//Modo 3
+// MODO 3
   // Control de distancia
   double Kp_dist_3 = 0;
   double Kd_dist_3 = 0;
@@ -95,7 +97,7 @@ int Ref_dif = 0;
   double Kd_dif_3 = 0;
   double Ki_dif_3 = 0;
 
-//Modo 4
+// MODO 4
   // Control de distancia
   double Kp_dist_4 = 0;
   double Kd_dist_4 = 0;
@@ -106,23 +108,42 @@ int Ref_dif = 0;
   double Kd_dif_4 = 0;
   double Ki_dif_4 = 0;
 
+// Variables necesaria para actualizar las ganancias desde comandos
+  int flag_ganancias = 0;
+  // Control de distancia
+  double Kp_dist_aux = 0;
+  double Kd_dist_aux = 0;
+  double Ki_dist_aux = 0;
+
+  // Control de angulo
+  double Kp_dif_aux = 0;
+  double Kd_dif_aux = 0;
+  double Ki_dif_aux = 0;
+
 void setup() {
-  Serial.begin(38400);
-  
+  // Establecemos la velocidad de comunicacion del bluetooth 
+  Serial1.begin(38400);
+
+  // Configuracion de los Pines del Servomotor Derecho
   pinMode(END,OUTPUT);
   pinMode(IN3,OUTPUT);
   pinMode(IN4,OUTPUT);
-  
+
+  // Configuracion de los Pines del Servomotor Izquierdo
   pinMode(ENI,OUTPUT);
   pinMode(IN1,OUTPUT);
   pinMode(IN2,OUTPUT);
 
+  // Configuracion de los pines de los Ultrasonidos
   pinMode(USDECHO, INPUT);
   pinMode(USDTRIG, OUTPUT);
   pinMode(USIECHO, INPUT);
   pinMode(USITRIG, OUTPUT);
 
+  // Delay para evitar conflictos con el puerto serie
   delay(300);
+
+  // Encendido de los ultrasonidos y el bluetooth
   pinMode(BTPWR, OUTPUT);
   digitalWrite(BTPWR, HIGH);
   pinMode(USDPWR, OUTPUT);
@@ -130,11 +151,16 @@ void setup() {
   digitalWrite(USDPWR, HIGH);
   digitalWrite(USIPWR, HIGH);
 
+  // Lectura del tiempo actual para inicializar el tiempo
   tiempo = millis();
 }
 
+/* FUNCION PARA ANALIZAR LOS COMANDOS INTRODUCIDOS */
+/* TODOS LOS COMANDOS DEBEN COMENZAR POR UNA LETRA Y ACABAR POR UN PUNTO */
 void leer_comando() {
   int numero = 0;
+  
+  /* CAMBIO DE LA DISTANCIA DE REFERENCIA: Sintaxis: "[R/r][referenca]." */
   if(input[0] == 'r' || input[0] == 'R') {
     for(int j = 0; j < 8; j++) {
       if(input[j] == '.') {
@@ -146,6 +172,8 @@ void leer_comando() {
     }
     if(5 <= numero) Ref_dist = numero;
   }
+
+  /* CAMBIO DEL MODO DE FUNCIONAMIENTO: Sintaxis: "[M/m][modo]." */
   if(input[0] == 'm' || input[0] == 'M') {
     for(int j = 0; j < 8; j++) {
       if(input[j] == '.') {
@@ -157,64 +185,112 @@ void leer_comando() {
     }
     Modo = numero;
   }
-  if(input[0] == 'p' || input[0] == 'P') {
-    for(int j = 0; j < 8; j++) {
-      if(input[j] == '.') {
-        j = 8;
+  /* CAMBIO DE LAS GANANCIAS DE CONTROL: Sintaxis: "[G/g][P/p/I/i/D/d][D/d/A/a][valor]." */
+  if(input[0] == 'g' || input[0] == 'G'){
+    if(input[0] == 'p' || input[0] == 'P') {
+      if(input[0] == 'd' || input[0] == 'D'){
+        for(int j = 0; j < 8; j++) {
+          if(input[j] == '.') {
+            j = 8;
+          }
+          else if(47 < input[j] && input[j] < 58) {
+            numero = numero * 10 + (input[j] - '0');
+          }
+        }
+        Kp_dist_aux = numero;
       }
-      else if(47 < input[j] && input[j] < 58) {
-        numero = numero * 10 + (input[j] - '0');
-      }
-    }
-    Kp_dif_2 = numero;
-  }
-  if(input[0] == 'i' || input[0] == 'I') {
-    for(int j = 0; j < 8; j++) {
-      if(input[j] == '.') {
-        j = 8;
-      }
-      else if(47 < input[j] && input[j] < 58) {
-        numero = numero * 10 + (input[j] - '0');
-      }
-    }
-    Ki_dif_2 = numero;
-  }
-  if(input[0] == 'd' || input[0] == 'D') {
-    for(int j = 0; j < 8; j++) {
-      if(input[j] == '.') {
-        j = 8;
-      }
-      else if(47 < input[j] && input[j] < 58) {
-        numero = numero * 10 + (input[j] - '0');
+      else if(input[0] == 'a' || input[0] == 'A'){
+        for(int j = 0; j < 8; j++) {
+          if(input[j] == '.') {
+            j = 8;
+          }
+          else if(47 < input[j] && input[j] < 58) {
+            numero = numero * 10 + (input[j] - '0');
+          }
+        }
+        Kp_dif_aux = numero;
       }
     }
-    Kd_dif_2 = numero;
+    if(input[0] == 'i' || input[0] == 'I') {
+      if(input[0] == 'd' || input[0] == 'D'){
+        for(int j = 0; j < 8; j++) {
+          if(input[j] == '.') {
+            j = 8;
+          }
+          else if(47 < input[j] && input[j] < 58) {
+            numero = numero * 10 + (input[j] - '0');
+          }
+        }
+        Kp_dist_aux = numero;
+      }
+      else if(input[0] == 'a' || input[0] == 'A'){
+        for(int j = 0; j < 8; j++) {
+          if(input[j] == '.') {
+            j = 8;
+          }
+          else if(47 < input[j] && input[j] < 58) {
+            numero = numero * 10 + (input[j] - '0');
+          }
+        }
+        Kp_dif_aux = numero;
+      }
+    }
+    if(input[0] == 'd' || input[0] == 'D') {
+      if(input[0] == 'd' || input[0] == 'D'){
+        for(int j = 0; j < 8; j++) {
+          if(input[j] == '.') {
+            j = 8;
+          }
+          else if(47 < input[j] && input[j] < 58) {
+            numero = numero * 10 + (input[j] - '0');
+          }
+        }
+        Kp_dist_aux = numero;
+      }
+      else if(input[0] == 'a' || input[0] == 'A'){
+        for(int j = 0; j < 8; j++) {
+          if(input[j] == '.') {
+            j = 8;
+          }
+          else if(47 < input[j] && input[j] < 58) {
+            numero = numero * 10 + (input[j] - '0');
+          }
+        }
+        Kp_dif_aux = numero;
+      }
+    }
   }
+
+  // Ponemos el vector completo a '.' para evitar errores
   for(int j = 0; j < 8; j++)
     input[j] = '.';
 }
 
 void loop() {
+  // Medimos el tiempo transcurrido
   timePrev = tiempo;
   tiempo = millis();
   elapsedTime = (tiempo - timePrev) / 1000;
 
-  if (Serial.available()) {
-    input[i] = Serial.read();
+  // Comprobamos si hay comandos para leer
+  if (Serial1.available()) {
+    input[i] = Serial1.read();
+    // Todos los comandos deben acabar con un punto
     if(input[i] == '.') {
+      // Cuando el punto indique el fin del comando pasamos a traducirlo
       leer_comando();
       i = 0;
     }
     else i ++;    
   }
 
-  // Lectura de los ultrasonidos
+  /* LECTURA DE LOS ULTRASONIDOS */
   digitalWrite(USDTRIG, LOW);
   delayMicroseconds(4);
   digitalWrite(USDTRIG, HIGH);
   delayMicroseconds(10);
   digitalWrite(USDTRIG, LOW);
-  
+
   duracionD = pulseIn(USDECHO, HIGH);
   
   digitalWrite(USITRIG, LOW);
@@ -225,11 +301,14 @@ void loop() {
   
   duracionI = pulseIn(USIECHO, HIGH);
 
+  // Conversion de las lecturas a distancias en cm
   DD = duracionD * 10 / 292 / 2;
   DI = duracionI * 10 / 292 / 2;
 
+  /* PROGRAMACION DE LOS DISTINTOS MODOS DE FUNCIONAMIENTO */
   switch(Modo){
     case 0:
+      // Todo parado
       u_D = 0;
       u_I = 0;
       
@@ -244,6 +323,7 @@ void loop() {
       break;
       
     case 1:
+      // Calculo de las señales de control
       D = (DD + DI)/2;
       prev_error_dist = error_dist;
       error_dist = D - Ref_dist;
@@ -253,6 +333,7 @@ void loop() {
       u_D = u_dist;
       u_I = u_dist;
 
+      // Configuracion de lo pines del servomotor derecho
       if(u_D == 0) {
         digitalWrite(IN3, LOW);
         digitalWrite(IN4, LOW);
@@ -265,7 +346,8 @@ void loop() {
         digitalWrite(IN3, LOW);
         digitalWrite(IN4, HIGH);
       }
-      
+
+      // Configuracion de lo pines del servomotor izquierdo
       if(u_I == 0) {
         digitalWrite(IN1, LOW);
         digitalWrite(IN2, LOW);
@@ -279,7 +361,7 @@ void loop() {
         digitalWrite(IN2, HIGH);
       }
     
-      // Anti-windup
+      // Anti-windup básico
       if (u_dist < -255 || 255 < u_dist)  int_error_dist -= elapsedTime * error_dist;
     
       // Saturaciones
@@ -287,18 +369,21 @@ void loop() {
       else if (u_D < - 255) u_D = - 255;
       if (u_I > 255)  u_I = 255;
       else if (u_I < - 255) u_I = - 255;
-      
+
+      // Aplicacion de las señales de control a cada servomotor
       analogWrite(END, abs(u_D));
       analogWrite(ENI, abs(u_I));
       break;
       
     case 2:
+      // Calculo de las señales de control en distancia
       D = (DD + DI)/2;
       prev_error_dist = error_dist;
       error_dist = D - Ref_dist;
       int_error_dist += elapsedTime * error_dist;
       u_dist = Kp_dist_2 * error_dist + Ki_dist_2 * int_error_dist + Kd_dist_2 * (error_dist - prev_error_dist) / elapsedTime;
-    
+
+      // Calculo de las señales de control de inclinación
       D_dif = DD - DI;
       prev_error_dif = error_dif;
       error_dif = Ref_dif - D_dif;
@@ -307,7 +392,8 @@ void loop() {
     
       u_D = (u_dist - u_dif/2);
       u_I = (u_dist + u_dif/2);
-    
+
+      // Configuracion de lo pines del servomotor derecho
       if(u_D == 0) {
         digitalWrite(IN3, LOW);
         digitalWrite(IN4, LOW);
@@ -320,7 +406,8 @@ void loop() {
         digitalWrite(IN3, LOW);
         digitalWrite(IN4, HIGH);
       }
-      
+
+      // Configuracion de lo pines del servomotor izquierdo
       if(u_I == 0) {
         digitalWrite(IN1, LOW);
         digitalWrite(IN2, LOW);
@@ -334,7 +421,7 @@ void loop() {
         digitalWrite(IN2, HIGH);
       }
     
-      // Anti-windup
+      // Anti-windup básico
       if (u_dist < -255 || 255 < u_dist)  int_error_dist -= elapsedTime * error_dist;
       if (u_dif < -255 || 255 < u_dif)  int_error_dif -= elapsedTime * error_dif;
     
@@ -343,7 +430,8 @@ void loop() {
       else if (u_D < - 255) u_D = - 255;
       if (u_I > 255)  u_I = 255;
       else if (u_I < - 255) u_I = - 255;
-      
+
+      // Aplicacion de las señales de control a cada servomotor
       analogWrite(END, abs(u_D));
       analogWrite(ENI, abs(u_I));
       break;
@@ -354,6 +442,7 @@ void loop() {
       break;
       
     default: 
+      // Por seguridad, como accion por defecto paramos todo
       u_D = 0;
       u_I = 0;
       
@@ -368,44 +457,43 @@ void loop() {
       break;
   }
 
-  // 1
-  Serial.print(elapsedTime * 1000);
-  Serial.print(" ");
+  /* SALIDA DE DATOS */
+  // 1. Tiempo transcurrido durante ell ultimo ciclo de control (ms)
+  Serial1.print(elapsedTime * 1000);
+  Serial1.print(" ");
 
-  // 2
-  Serial.print(DI);
-  Serial.print(" ");
+  // 2. Distancia del ultrasonidos izquierdo a la pared (cm)
+  Serial1.print(DI);
+  Serial1.print(" ");
 
-  // 3
-  Serial.print(DD);
-  Serial.print(" ");
+  // 3. Distancia del ultrasonidos derecho a la pared (cm)
+  Serial1.print(DD);
+  Serial1.print(" ");
 
-  // 4
-  Serial.print(Ref_dist);
-  Serial.print(" ");
+  // 4. Referencia de distancia (cm)
+  Serial1.print(Ref_dist);
+  Serial1.print(" ");
 
-  // 5
-  Serial.print(Modo);
-  Serial.print(" ");
+  // 5. Modo de funcionamiento
+  Serial1.print(Modo);
+  Serial1.print(" ");
 
-  // 6
-  Serial.print(u_I);
-  Serial.print(" ");
+  // 6. Señal de control del servomotor izquierdo (PWM)
+  Serial1.print(u_I);
+  Serial1.print(" ");
 
-  //Serial.println(u_D);
+  // 7. Señal de control del servomotor derecho (PWM)
+  Serial1.print(u_D);
+  Serial1.print(" ");
 
-  // 7
-  Serial.print(u_D);
-  Serial.print(" ");
+  // 8. Distancia a la pared (cm)
+  Serial1.print(D);
+  Serial1.print(" ");
 
-  // 8
-  Serial.print(D);
-  Serial.print(" ");
+  // 9. Distancia diferencial (cm)
+  Serial1.print(D_dif);
+  Serial1.print(" ");
 
-  // 9
-  Serial.print(D_dif);
-  Serial.print(" ");
-
-  // 10
-  Serial.println(Ref_dif);
+  // 10. Referencia de distancia diferencial (cm)
+  Serial1.println(Ref_dif);
 }

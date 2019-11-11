@@ -14,16 +14,22 @@
 function telemetria(archivo)
 close all;
 
-tel=load(archivo);
-muestras=length(tel);
-disp('Incremento de tiempo mínimo:'); disp(min(tel(:,1)));
-disp('Incremento de tiempo máximo:');disp(max(tel(:,1)));
-disp('Incremento de tiempo promedio:'); disp(mean(tel(:,1)));
-tiempo=zeros(1,muestras);
-tiempo(1)=tel(1,1); %Vector de tiempo absoluto
-for i=2:muestras
-    tiempo(i)=tiempo(i-1)+tel(i,1);
-end    
+tel = load(archivo);
+muestras = length(tel);
+
+disp('Incremento de tiempo mínimo (ms):'); disp(min(tel(:,1)));
+disp('Incremento de tiempo máximo (ms):');disp(max(tel(:,1)));
+disp('Incremento de tiempo promedio (ms):'); disp(mean(tel(:,1)));
+
+%Cálculo del Vector de tiempo absoluto
+tiempo = zeros(1,muestras);
+tiempo(1) = tel(1,1);
+for i = 2:muestras
+    tiempo(i) = tiempo(i-1) + tel(i,1);
+end 
+for i = 1:muestras
+    tiempo(i) = tiempo(i)/1000;
+end
 
 figure(1);
     subplot(2,1,1);
