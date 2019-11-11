@@ -27,10 +27,11 @@ end
 
 figure(1);
     subplot(2,1,1);
-    plot(tiempo,tel(:,8), 'b', tiempo,tel(:,4), 'r');
+    plot(tiempo,tel(:,8)/10, 'b', tiempo,tel(:,4)/10, 'r');
     ylabel('Distancia hasta la pared (cm)');
     title('Control en distancia');
     legend('Distancia','Referencia');
+    grid;
 
     subplot(2,1,2);
     plot(tiempo,tel(:,5), 'k', tiempo,tel(:,6), 'r', tiempo,tel(:,7), 'b');
@@ -38,6 +39,7 @@ figure(1);
     xlabel('Tiempo (ms)');
     ylabel('Señal de control (PWM)');
     legend('Modo', 'u_I', 'u_D');
+    grid;
     aux = axis;
     aux(1,3) = -255;
     aux(1,4) = 255;
@@ -45,10 +47,11 @@ figure(1);
 
 figure(2);
     subplot(2,1,1);
-    plot(tiempo,tel(:,9), 'b', tiempo,tel(:,10), 'r');
-    ylabel('Distancia diferencial(cm)');
+    plot(tiempo,tel(:,9)/10, 'b', tiempo,tel(:,10)/10, 'r');
+    ylabel('Distancia diferencial (cm)');
     title('Control de angulo');
     legend('Distancia Diferencial', 'Referencia');
+    grid;
 
     subplot(2,1,2);
     plot(tiempo,tel(:,5), 'k', tiempo,tel(:,6), 'r', tiempo,tel(:,7), 'b');
@@ -56,6 +59,7 @@ figure(2);
     xlabel('Tiempo (ms)');
     ylabel('Señal de control (PWM)');
     legend('Modo', 'u_I', 'u_D');
+    grid;
     aux = axis;
     aux(1,3) = -255;
     aux(1,4) = 255;
@@ -63,17 +67,19 @@ figure(2);
 
 figure(3);
     subplot(2,1,1);
-    plot(tiempo,tel(:,2), tiempo,tel(:,3), tiempo,tel(:,4));
+    plot(tiempo,tel(:,2)/10, tiempo,tel(:,3)/10, tiempo,tel(:,4)/10);
     title('Lecturas de lo Sensores');
     ylabel('Distancia (cm)');
     legend('Ultrasonidos Izquierdo', 'Ultrasonidos Derecho', 'Referencia' );
-
+    grid;
+    
     subplot(2,1,2);
     plot(tiempo,tel(:,5), tiempo,tel(:,6), tiempo,tel(:,7));
     title('Actuadores');
     xlabel('Tiempo (ms)');
     ylabel('Señal de control (PWM)');
     legend('Modo', 'u_I', 'u_D');
+    grid;
     aux = axis;
     aux(1,3) = -255;
     aux(1,4) = 255;
