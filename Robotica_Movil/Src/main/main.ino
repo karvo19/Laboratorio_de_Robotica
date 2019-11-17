@@ -44,6 +44,9 @@ float u_dist;   // señal de control en distancia
 float u_D;      // señal de control del servo derecho
 float u_I;      // señal de control del servo izquierdo
 
+// Velocidad para los modos de movimiento continuo
+float velocidad = 180;
+
 // Distancias
 int D;   // distancia del centro a la pared en linea recta
 int D_dif; // distancia diferencial
@@ -180,6 +183,20 @@ void leer_comando() {
       }
     }
     Modo = numero;
+  }
+
+  /* CAMBIO DE LA VELOCIDAD DE AVANCE PARA LOS MODOS 3 Y 4. Sintaxis: "[V/v][velocidad]." */
+  if(input[0] == 'v' || input[0] == 'V') {
+    for(int j = 0; j < 8; j++) {
+      if(input[j] == '.') {
+        j = 8;
+      }
+      else if(47 < input[j] && input[j] < 58) {
+        numero = numero * 10 + (input[j] - '0');
+      }
+    }
+    if(numero >= 150) velocidad = numero;
+    else              velocidad = 150;
   }
   
   /* CAMBIO DE LAS GANANCIAS DE CONTROL: Sintaxis: "[G/g][P/p/I/i/D/d][D/d/A/a][valor]." */
@@ -517,9 +534,118 @@ void loop() {
       analogWrite(ENI, abs(u_I));
       break;
     case 3:
+      // Calculo de las señales de control en distancia
+      Ref_dist = 50;
+
+      if(abs(DD_anterior - DD) > 10)  DD = DD_anterior;
+      D = DD;
+      prev_error_dist = error_dist;
+      error_dist = D - Ref_dist;
+      int_error_dist += elapsedTime * error_dist;
+      u_dist = Kp_dist_2 * error_dist + Ki_dist_2 * int_error_dist + Kd_dist_2 * (error_dist - prev_error_dist) / elapsedTime;
+
+      // Calculo de las señales de control de inclinación
+      u_D = (velocidad + u_dist/2);
+      u_I = (velocidad - u_dist/2);
+
+      // Configuracion de lo pines del servomotor derecho
+      if(u_D == 0) {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, LOW);
+      }
+      else if (u_D > 0) {
+        digitalWrite(IN3, HIGH);
+        digitalWrite(IN4, LOW);
+      }
+      else {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, HIGH);
+      }
+
+      // Configuracion de lo pines del servomotor izquierdo
+      if(u_I == 0) {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, LOW);
+      }
+      else if (u_I > 0) {
+        digitalWrite(IN1, HIGH);
+        digitalWrite(IN2, LOW);
+      }
+      else {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, HIGH);
+      }
+    
+      // Anti-windup básico
+      if (u_dist < -255 || 255 < u_dist)  int_error_dist -= elapsedTime * error_dist;
+      if (u_dif < -255 || 255 < u_dif)  int_error_dif -= elapsedTime * error_dif;
+    
+      // Saturaciones
+      if (u_D > 255)  u_D = 255;
+      else if (u_D < - 255) u_D = - 255;
+      if (u_I > 255)  u_I = 255;
+      else if (u_I < - 255) u_I = - 255;
+
+      // Aplicacion de las señales de control a cada servomotor
+      analogWrite(END, abs(u_D));
+      analogWrite(ENI, abs(u_I));
       break;
       
     case 4:
+      // Calculo de las señales de control en distancia
+
+      if(abs(DD_anterior - DD) > 10)  DD = DD_anterior;
+      D = DD;
+      prev_error_dist = error_dist;
+      error_dist = D - Ref_dist;
+      int_error_dist += elapsedTime * error_dist;
+      u_dist = Kp_dist_2 * error_dist + Ki_dist_2 * int_error_dist + Kd_dist_2 * (error_dist - prev_error_dist) / elapsedTime;
+
+      // Calculo de las señales de control de inclinación
+      u_D = (velocidad + u_dist/2);
+      u_I = (velocidad - u_dist/2);
+
+      // Configuracion de lo pines del servomotor derecho
+      if(u_D == 0) {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, LOW);
+      }
+      else if (u_D > 0) {
+        digitalWrite(IN3, HIGH);
+        digitalWrite(IN4, LOW);
+      }
+      else {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, HIGH);
+      }
+
+      // Configuracion de lo pines del servomotor izquierdo
+      if(u_I == 0) {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, LOW);
+      }
+      else if (u_I > 0) {
+        digitalWrite(IN1, HIGH);
+        digitalWrite(IN2, LOW);
+      }
+      else {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, HIGH);
+      }
+    
+      // Anti-windup básico
+      if (u_dist < -255 || 255 < u_dist)  int_error_dist -= elapsedTime * error_dist;
+      if (u_dif < -255 || 255 < u_dif)  int_error_dif -= elapsedTime * error_dif;
+    
+      // Saturaciones
+      if (u_D > 255)  u_D = 255;
+      else if (u_D < - 255) u_D = - 255;
+      if (u_I > 255)  u_I = 255;
+      else if (u_I < - 255) u_I = - 255;
+
+      // Aplicacion de las señales de control a cada servomotor
+      analogWrite(END, abs(u_D));
+      analogWrite(ENI, abs(u_I));
       break;
       
     default: 
