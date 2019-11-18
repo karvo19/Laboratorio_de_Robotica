@@ -52,6 +52,7 @@ int D;   // distancia del centro a la pared en linea recta
 int D_dif; // distancia diferencial
 int DD;  // distancia del sensor ultrasonidos derecho a la pared en linea recta
 int DI;  // distancia del sensor ultrasonidos izquierdo a la pared en linea recta
+int DD_anterior = -1; // Variable para evitar errores en los modos 3 y 4
 
 // Variables para la lectura de los ultrasonidos
 float duracionD, duracionI;
@@ -71,28 +72,31 @@ int Modo = 0;   // 0 -> parado
 int Ref_dist = 30;  // referencia en distancia
 int Ref_dif = 0;    // referencia diferencial
 
+/* OFFSETS PARA CORREGIR LA ZONA MUERTA DE LOS MOTORES */
+int Offset = 105;
+
 /* GANANCIAS DE CONTROL */
 // MODO 1
   // Control de distancia
-  double Kp_dist_1 = 10;
-  double Kd_dist_1 = 2;
-  double Ki_dist_1 = 7;
+  double Kp_dist_1 = 5;
+  double Kd_dist_1 = 0.5;
+  double Ki_dist_1 = 0;
 
 // MODO 2
   // Control de distancia
-  double Kp_dist_2 = 0;
-  double Kd_dist_2 = 0;
+  double Kp_dist_2 = 5;
+  double Kd_dist_2 = 0.5;
   double Ki_dist_2 = 0;
 
   // Control de angulo
-  double Kp_dif_2 = 80;
-  double Kd_dif_2 = 5;
-  double Ki_dif_2 = 1;
+  double Kp_dif_2 = 25;
+  double Kd_dif_2 = 0.5;
+  double Ki_dif_2 = 0;
 
 // MODO 3
   // Control de distancia
-  double Kp_dist_3 = 0;
-  double Kd_dist_3 = 0;
+  double Kp_dist_3 = 5;
+  double Kd_dist_3 = 0.5;
   double Ki_dist_3 = 0;
 
   // Control de angulo
@@ -439,10 +443,12 @@ void loop() {
       else if (u_D > 0) {
         digitalWrite(IN3, HIGH);
         digitalWrite(IN4, LOW);
+        u_D += Offset;
       }
       else {
         digitalWrite(IN3, LOW);
         digitalWrite(IN4, HIGH);
+        u_D -= Offset;
       }
 
       // Configuracion de lo pines del servomotor izquierdo
@@ -453,10 +459,12 @@ void loop() {
       else if (u_I > 0) {
         digitalWrite(IN1, HIGH);
         digitalWrite(IN2, LOW);
+        u_I += Offset;
       }
       else {
         digitalWrite(IN1, LOW);
         digitalWrite(IN2, HIGH);
+        u_I -= Offset;
       }
     
       // Anti-windup básico
@@ -499,10 +507,12 @@ void loop() {
       else if (u_D > 0) {
         digitalWrite(IN3, HIGH);
         digitalWrite(IN4, LOW);
+        u_D += Offset;
       }
       else {
         digitalWrite(IN3, LOW);
         digitalWrite(IN4, HIGH);
+        u_D -= Offset;
       }
 
       // Configuracion de lo pines del servomotor izquierdo
@@ -513,10 +523,12 @@ void loop() {
       else if (u_I > 0) {
         digitalWrite(IN1, HIGH);
         digitalWrite(IN2, LOW);
+        u_I += Offset;
       }
       else {
         digitalWrite(IN1, LOW);
         digitalWrite(IN2, HIGH);
+        u_I -= Offset;
       }
     
       // Anti-windup básico
@@ -537,6 +549,8 @@ void loop() {
       // Calculo de las señales de control en distancia
       Ref_dist = 50;
 
+      if(DD_anterior == -1) DD_anterior = DD;
+
       if(abs(DD_anterior - DD) > 10)  DD = DD_anterior;
       D = DD;
       prev_error_dist = error_dist;
@@ -556,10 +570,12 @@ void loop() {
       else if (u_D > 0) {
         digitalWrite(IN3, HIGH);
         digitalWrite(IN4, LOW);
+        u_D += Offset;
       }
       else {
         digitalWrite(IN3, LOW);
         digitalWrite(IN4, HIGH);
+        u_D -= Offset;
       }
 
       // Configuracion de lo pines del servomotor izquierdo
@@ -570,10 +586,12 @@ void loop() {
       else if (u_I > 0) {
         digitalWrite(IN1, HIGH);
         digitalWrite(IN2, LOW);
+        u_I += Offset;
       }
       else {
         digitalWrite(IN1, LOW);
         digitalWrite(IN2, HIGH);
+        u_I -= Offset;
       }
     
       // Anti-windup básico
@@ -589,10 +607,13 @@ void loop() {
       // Aplicacion de las señales de control a cada servomotor
       analogWrite(END, abs(u_D));
       analogWrite(ENI, abs(u_I));
+
+      DD_anterior = DD;
       break;
       
     case 4:
       // Calculo de las señales de control en distancia
+      if(DD_anterior == -1) DD_anterior = DD;
 
       if(abs(DD_anterior - DD) > 10)  DD = DD_anterior;
       D = DD;
@@ -613,10 +634,12 @@ void loop() {
       else if (u_D > 0) {
         digitalWrite(IN3, HIGH);
         digitalWrite(IN4, LOW);
+        u_D += Offset;
       }
       else {
         digitalWrite(IN3, LOW);
         digitalWrite(IN4, HIGH);
+        u_D -= Offset;
       }
 
       // Configuracion de lo pines del servomotor izquierdo
@@ -627,10 +650,12 @@ void loop() {
       else if (u_I > 0) {
         digitalWrite(IN1, HIGH);
         digitalWrite(IN2, LOW);
+        u_I += Offset;
       }
       else {
         digitalWrite(IN1, LOW);
         digitalWrite(IN2, HIGH);
+        u_I -= Offset;
       }
     
       // Anti-windup básico
@@ -646,6 +671,8 @@ void loop() {
       // Aplicacion de las señales de control a cada servomotor
       analogWrite(END, abs(u_D));
       analogWrite(ENI, abs(u_I));
+
+      DD_anterior = DD;
       break;
       
     default: 
@@ -702,5 +729,12 @@ void loop() {
   Serial1.print(" ");
 
   // 10. Referencia de distancia diferencial (cm)
-  Serial1.println(Ref_dif);
+  Serial1.print(Ref_dif);
+  Serial1.print(" ");
+
+  Serial1.print(Kp_dist_1);
+  Serial1.print(" ");
+  Serial1.print(Ki_dist_1);
+  Serial1.print(" ");
+  Serial1.println(Kd_dist_1);
 }
