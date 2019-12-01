@@ -105,7 +105,7 @@ float velocidad = 50;
   double Ki_dif_3 = 0;
 
 // Variables auxiliares para el control 4
-double D_dif_max = 15;
+double D_dif_max = 7;
 int flag = 0;
 double Ref_dist_prev = 0;
 
@@ -116,16 +116,20 @@ double Ref_dist_prev = 0;
   double Ki_dist_4 = 0;
 
   // Control de angulo
-  double Kp_dif_4 = 4;
-  double Kd_dif_4 = 0.1;
+  double Kp_dif_4 = 25;
+  double Kd_dif_4 = 0.5;
   double Ki_dif_4 = 0;
 
-// Variables necesaria para actualizar las ganancias desde comandos
-  int flag_ganancias = 0;
-  // Control de distancia
-  double Kp_dist_aux = 0;
-  double Kd_dist_aux = 0;
-  double Ki_dist_aux = 0;
+// MODO 5 (Modo 4 pero con otra tecnica de control)
+  // Control de distancia (ahora saca ref para control de angulo)
+  double Kp_dist_5 = 10;
+  double Kd_dist_5 = 2;
+  double Ki_dist_5 = 0;
+
+  // Control de angulo
+  double Kp_dif_5 = 9;
+  double Kd_dif_5 = 0.75;
+  double Ki_dif_5 = 0;
 
 
 void setup() {
@@ -207,166 +211,6 @@ void leer_comando() {
     }
     if(numero >= 150) velocidad = numero;
     else              velocidad = 150;
-  }
-  
-  /* CAMBIO DE LAS GANANCIAS DE CONTROL: Sintaxis: "[G/g][P/p/I/i/D/d][D/d/A/a][valor]." */
-  if(input[0] == 'g' || input[0] == 'G'){
-    if(input[0] == 'p' || input[0] == 'P') {
-      if(input[0] == 'd' || input[0] == 'D'){
-        for(int j = 0; j < 8; j++) {
-          if(input[j] == '.') {
-            j = 8;
-          }
-          else if(47 < input[j] && input[j] < 58) {
-            numero = numero * 10 + (input[j] - '0');
-          }
-        }
-        switch(Modo){
-          case 0: break;
-          case 1:
-            Kp_dist_1 = numero;
-            break;
-          case 2:
-            Kp_dist_2 = numero;
-            break;
-          case 3:
-            Kp_dist_3 = numero;
-            break;
-          case 4:
-            Kp_dist_4 = numero;
-            break;
-          default: break;
-        }
-      }
-      else if(input[0] == 'a' || input[0] == 'A'){
-        for(int j = 0; j < 8; j++) {
-          if(input[j] == '.') {
-            j = 8;
-          }
-          else if(47 < input[j] && input[j] < 58) {
-            numero = numero * 10 + (input[j] - '0');
-          }
-        }
-        switch(Modo){
-          case 0: break;
-          case 1: break;
-          case 2:
-            Kp_dif_2 = numero;
-            break;
-          case 3:
-            Kp_dif_3 = numero;
-            break;
-          case 4:
-            Kp_dif_4 = numero;
-            break;
-          default: break;
-        }
-      }
-    }
-    if(input[0] == 'i' || input[0] == 'I') {
-      if(input[0] == 'd' || input[0] == 'D'){
-        for(int j = 0; j < 8; j++) {
-          if(input[j] == '.') {
-            j = 8;
-          }
-          else if(47 < input[j] && input[j] < 58) {
-            numero = numero * 10 + (input[j] - '0');
-          }
-        }
-        switch(Modo){
-          case 0: break;
-          case 1:
-            Ki_dist_1 = numero;
-            break;
-          case 2:
-            Ki_dist_2 = numero;
-            break;
-          case 3:
-            Ki_dist_3 = numero;
-            break;
-          case 4:
-            Ki_dist_4 = numero;
-            break;
-          default: break;
-        }
-      }
-      else if(input[0] == 'a' || input[0] == 'A'){
-        for(int j = 0; j < 8; j++) {
-          if(input[j] == '.') {
-            j = 8;
-          }
-          else if(47 < input[j] && input[j] < 58) {
-            numero = numero * 10 + (input[j] - '0');
-          }
-        }
-        switch(Modo){
-          case 0: break;
-          case 1: break;
-          case 2:
-            Ki_dif_2 = numero;
-            break;
-          case 3:
-            Ki_dif_3 = numero;
-            break;
-          case 4:
-            Ki_dif_4 = numero;
-            break;
-          default: break;
-        }
-      }
-    }
-    if(input[0] == 'd' || input[0] == 'D') {
-      if(input[0] == 'd' || input[0] == 'D'){
-        for(int j = 0; j < 8; j++) {
-          if(input[j] == '.') {
-            j = 8;
-          }
-          else if(47 < input[j] && input[j] < 58) {
-            numero = numero * 10 + (input[j] - '0');
-          }
-        }
-        switch(Modo){
-          case 0: break;
-          case 1:
-            Kd_dist_1 = numero;
-            break;
-          case 2:
-            Kd_dist_2 = numero;
-            break;
-          case 3:
-            Kd_dist_3 = numero;
-            break;
-          case 4:
-            Kd_dist_4 = numero;
-            break;
-          default: break;
-        }
-      }
-      else if(input[0] == 'a' || input[0] == 'A'){
-        for(int j = 0; j < 8; j++) {
-          if(input[j] == '.') {
-            j = 8;
-          }
-          else if(47 < input[j] && input[j] < 58) {
-            numero = numero * 10 + (input[j] - '0');
-          }
-        }
-        switch(Modo){
-          case 0: break;
-          case 1: break;
-          case 2:
-            Kd_dif_2 = numero;
-            break;
-          case 3:
-            Kd_dif_3 = numero;
-            break;
-          case 4:
-            Kd_dif_4 = numero;
-            break;
-          default: break;
-        }
-      }
-    }
   }
 
   // Ponemos el vector completo a '.' para evitar errores
@@ -618,10 +462,14 @@ void loop() {
       break;
       
     case 4:
-      // Calculo de las señales de control en distancia
+      // Calculo de las señales de control en distancia4
+      // Inicializamos a primera vez que entramos en modo 4
       if(DD_anterior == -1) DD_anterior = DD;
 
-      if(abs(DD_anterior - DD) > 10)  DD = DD_anterior;
+      // Prevencion de ruidos
+      if(abs(DD_anterior - DD) > 2)  DD = DD_anterior;
+
+      // Controlamos la distancia solo con el sensor derecho
       D = DD;
       prev_error_dist = error_dist;
       error_dist = D - Ref_dist;
@@ -647,7 +495,11 @@ void loop() {
         if(error_dist > 0)  Ref_dif = -D_dif_max/2;
         else                Ref_dif =  D_dif_max/2;
       }
-      if(flag == 1 && (D > Ref_dist - (0) || D < Ref_dist + (0)))  flag = 0;
+      if(flag == 1 && (D > Ref_dist - (0) || D < Ref_dist + (0)))
+      {
+        flag = 0;
+        Ref_dif = 0;
+      }
       
       // Control de "cambio de carril"
       if(flag == 1)
@@ -660,22 +512,85 @@ void loop() {
         // Calculo de las señales de control de inclinación
         u_D = (velocidad + u_dif/2);
         u_I = (velocidad - u_dif/2);
+      }      
+
+
+      // Configuracion de lo pines del servomotor derecho
+      if(u_D == 0) {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, LOW);
+      }
+      else if (u_D > 0) {
+        digitalWrite(IN3, HIGH);
+        digitalWrite(IN4, LOW);
+        u_D += Offset;
+      }
+      else {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, HIGH);
+        u_D -= Offset;
       }
 
-      /*if(Ref_dist_prev > Ref_dist)        flag_ref = 1;
-      else if(Ref_dist_prev > Ref_dist)   flag_ref = 2;
-      if(flag_ref = 1)
-      {
-        u_D = (velocidad + 10);
-        u_I = (velocidad - 10);
+      // Configuracion de lo pines del servomotor izquierdo
+      if(u_I == 0) {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, LOW);
       }
-      if(flag_ref = 2)
-      {
-        u_D = (velocidad - 10);
-        u_I = (velocidad + 10);
+      else if (u_I > 0) {
+        digitalWrite(IN1, HIGH);
+        digitalWrite(IN2, LOW);
+        u_I += Offset;
       }
-      Ref_dist_prev = Ref_dist;*/
-      
+      else {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, HIGH);
+        u_I -= Offset;
+      }
+    
+      // Anti-windup básico
+      if (u_dist < -255 || 255 < u_dist)  int_error_dist -= elapsedTime * error_dist;
+      if (u_dif < -255 || 255 < u_dif)  int_error_dif -= elapsedTime * error_dif;
+    
+      // Saturaciones
+      if (u_D > 255)  u_D = 255;
+      else if (u_D < - 255) u_D = - 255;
+      if (u_I > 255)  u_I = 255;
+      else if (u_I < - 255) u_I = - 255;
+
+      // Aplicacion de las señales de control a cada servomotor
+      analogWrite(END, abs(u_D));
+      analogWrite(ENI, abs(u_I));
+
+      DD_anterior = DD;
+      break;
+
+      case 5:
+      // Calculo de las señales de control en distancia5
+      // Inicializamos a primera vez que entramos en modo 5
+      if(DD_anterior == -1) DD_anterior = DD;
+
+      // Prevencion de ruidos
+      if(abs(DD_anterior - DD) > 2)  DD = DD_anterior;
+
+      // Controlamos la distancia solo con el sensor derecho
+      D = DD;
+      prev_error_dist = error_dist;
+      error_dist = D - Ref_dist;
+      int_error_dist += elapsedTime * error_dist;
+
+      // Calculo de la referencia del siguiente control
+      Ref_dif = Kp_dist_2 * error_dist + Ki_dist_2 * int_error_dist + Kd_dist_2 * (error_dist - prev_error_dist) / elapsedTime;
+
+      // Control de angulo
+      D_dif = DD - DI;
+      prev_error_dif = error_dif;
+      error_dif = Ref_dif - D_dif;
+      int_error_dif += elapsedTime * error_dif;
+      u_dif = Kp_dif_2 * error_dif + Ki_dif_2 * int_error_dif + Kd_dif_2 * (error_dif - prev_error_dif) / elapsedTime;
+
+      // Calculo de las señales de control de inclinación
+      u_D = (velocidad + u_dif);
+      u_I = (velocidad - u_dif);      
 
 
       // Configuracion de lo pines del servomotor derecho
@@ -784,9 +699,8 @@ void loop() {
   Serial1.print(Ref_dif);
   Serial1.print(" ");
 
-  Serial1.print(Kp_dist_1);
-  Serial1.print(" ");
-  Serial1.print(Ki_dist_1);
-  Serial1.print(" ");
-  Serial1.println(Kd_dist_1);
+  // Flag del modo 4
+  Serial1.println(flag);
+
+  
 }
