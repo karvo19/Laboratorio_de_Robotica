@@ -44,9 +44,6 @@ float u_dist;   // señal de control en distancia
 float u_D;      // señal de control del servo derecho
 float u_I;      // señal de control del servo izquierdo
 
-// Velocidad para los modos de movimiento continuo
-float velocidad = 180;
-
 // Distancias
 int D;   // distancia del centro a la pared en linea recta
 int D_dif; // distancia diferencial
@@ -93,10 +90,13 @@ int Offset = 105;
   double Kd_dif_2 = 0.5;
   double Ki_dif_2 = 0;
 
+// Velocidad para los modos de movimiento continuo
+float velocidad = 50;
+
 // MODO 3
   // Control de distancia
-  double Kp_dist_3 = 5;
-  double Kd_dist_3 = 0.5;
+  double Kp_dist_3 = 10;
+  double Kd_dist_3 = 2;
   double Ki_dist_3 = 0;
 
   // Control de angulo
@@ -104,15 +104,20 @@ int Offset = 105;
   double Kd_dif_3 = 0;
   double Ki_dif_3 = 0;
 
+// Variables auxiliares para el control 4
+double D_dif_max = 15;
+int flag = 0;
+double Ref_dist_prev = 0;
+
 // MODO 4
   // Control de distancia
-  double Kp_dist_4 = 0;
-  double Kd_dist_4 = 0;
+  double Kp_dist_4 = 10;
+  double Kd_dist_4 = 2;
   double Ki_dist_4 = 0;
 
   // Control de angulo
-  double Kp_dif_4 = 0;
-  double Kd_dif_4 = 0;
+  double Kp_dif_4 = 4;
+  double Kd_dif_4 = 0.1;
   double Ki_dif_4 = 0;
 
 // Variables necesaria para actualizar las ganancias desde comandos
@@ -187,6 +192,7 @@ void leer_comando() {
       }
     }
     Modo = numero;
+    if(Modo == 3 || Modo == 4)        Ref_dist = DD; //(DD + DI)/2;
   }
 
   /* CAMBIO DE LA VELOCIDAD DE AVANCE PARA LOS MODOS 3 Y 4. Sintaxis: "[V/v][velocidad]." */
@@ -413,6 +419,8 @@ void loop() {
       // Todo parado
       u_D = 0;
       u_I = 0;
+
+      D = (DD + DI)/2;
       
       digitalWrite(IN3, LOW);
       digitalWrite(IN4, LOW);
@@ -547,8 +555,6 @@ void loop() {
       break;
     case 3:
       // Calculo de las señales de control en distancia
-      Ref_dist = 50;
-
       if(DD_anterior == -1) DD_anterior = DD;
 
       if(abs(DD_anterior - DD) > 10)  DD = DD_anterior;
@@ -625,6 +631,52 @@ void loop() {
       // Calculo de las señales de control de inclinación
       u_D = (velocidad + u_dist/2);
       u_I = (velocidad - u_dist/2);
+
+      // Calculo de las señales de control de inclinación
+      D_dif = DD - DI;
+      // Condicion para entrar en control de "cambio de carril"
+      if(D_dif >= D_dif_max)
+      {
+        flag = 1;
+        if(error_dist > 0)  Ref_dif = -D_dif_max;
+        else                Ref_dif =  D_dif_max;
+      }
+      // Condicion para desactivar el control de "cambio de carril"
+      if(flag == 1 && (D > Ref_dist - (5) || D < Ref_dist + (5)))
+      {
+        if(error_dist > 0)  Ref_dif = -D_dif_max/2;
+        else                Ref_dif =  D_dif_max/2;
+      }
+      if(flag == 1 && (D > Ref_dist - (0) || D < Ref_dist + (0)))  flag = 0;
+      
+      // Control de "cambio de carril"
+      if(flag == 1)
+      {
+        prev_error_dif = error_dif;
+        error_dif = Ref_dif - D_dif;
+        int_error_dif += elapsedTime * error_dif;
+        u_dif = Kp_dif_2 * error_dif + Ki_dif_2 * int_error_dif + Kd_dif_2 * (error_dif - prev_error_dif) / elapsedTime;
+
+        // Calculo de las señales de control de inclinación
+        u_D = (velocidad + u_dif/2);
+        u_I = (velocidad - u_dif/2);
+      }
+
+      /*if(Ref_dist_prev > Ref_dist)        flag_ref = 1;
+      else if(Ref_dist_prev > Ref_dist)   flag_ref = 2;
+      if(flag_ref = 1)
+      {
+        u_D = (velocidad + 10);
+        u_I = (velocidad - 10);
+      }
+      if(flag_ref = 2)
+      {
+        u_D = (velocidad - 10);
+        u_I = (velocidad + 10);
+      }
+      Ref_dist_prev = Ref_dist;*/
+      
+
 
       // Configuracion de lo pines del servomotor derecho
       if(u_D == 0) {
