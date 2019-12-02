@@ -95,8 +95,8 @@ float velocidad = 50;
 
 // MODO 3
   // Control de distancia
-  double Kp_dist_3 = 10;
-  double Kd_dist_3 = 2;
+  double Kp_dist_3 = 5;
+  double Kd_dist_3 = 0.5;
   double Ki_dist_3 = 0;
 
   // Control de angulo
@@ -105,31 +105,39 @@ float velocidad = 50;
   double Ki_dif_3 = 0;
 
 // Variables auxiliares para el control 4
-double D_dif_max = 7;
+double D_dif_max = 4;
 int flag = 0;
 double Ref_dist_prev = 0;
 
 // MODO 4
   // Control de distancia
-  double Kp_dist_4 = 10;
-  double Kd_dist_4 = 2;
+  double Kp_dist_4 = 5;
+  double Kd_dist_4 = 0.05;
   double Ki_dist_4 = 0;
 
   // Control de angulo
-  double Kp_dif_4 = 25;
-  double Kd_dif_4 = 0.5;
+  double Kp_dif_4 = 0.5;
+  double Kd_dif_4 = 0;
   double Ki_dif_4 = 0;
 
 // MODO 5 (Modo 4 pero con otra tecnica de control)
   // Control de distancia (ahora saca ref para control de angulo)
-  double Kp_dist_5 = 10;
-  double Kd_dist_5 = 2;
+  double Kp_dist_5 = 0.01;
+  double Kd_dist_5 = 0;
   double Ki_dist_5 = 0;
 
   // Control de angulo
-  double Kp_dif_5 = 9;
-  double Kd_dif_5 = 0.75;
+  double Kp_dif_5 = 10;
+  double Kd_dif_5 = 0.5;
   double Ki_dif_5 = 0;
+
+// MODO 6
+  // Control de distancia
+  double Kp_dist_6 = 3;
+  double Kd_dist_6 = 0.5;
+  double Ki_dist_6 = 0;
+
+  double Ref_anterior = -1;
 
 
 void setup() {
@@ -196,7 +204,7 @@ void leer_comando() {
       }
     }
     Modo = numero;
-    if(Modo == 3 || Modo == 4)        Ref_dist = DD; //(DD + DI)/2;
+    if(Modo == 3 || Modo == 4 || Modo == 5 || Modo == 6)        Ref_dist = DD; //(DD + DI)/2;
   }
 
   /* CAMBIO DE LA VELOCIDAD DE AVANCE PARA LOS MODOS 3 Y 4. Sintaxis: "[V/v][velocidad]." */
@@ -406,7 +414,7 @@ void loop() {
       prev_error_dist = error_dist;
       error_dist = D - Ref_dist;
       int_error_dist += elapsedTime * error_dist;
-      u_dist = Kp_dist_2 * error_dist + Ki_dist_2 * int_error_dist + Kd_dist_2 * (error_dist - prev_error_dist) / elapsedTime;
+      u_dist = Kp_dist_3 * error_dist + Ki_dist_3 * int_error_dist + Kd_dist_3 * (error_dist - prev_error_dist) / elapsedTime;
 
       // Calculo de las señales de control de inclinación
       u_D = (velocidad + u_dist/2);
@@ -473,8 +481,9 @@ void loop() {
       D = DD;
       prev_error_dist = error_dist;
       error_dist = D - Ref_dist;
+      if(error_dist > 10)   error_dist = 10;
       int_error_dist += elapsedTime * error_dist;
-      u_dist = Kp_dist_2 * error_dist + Ki_dist_2 * int_error_dist + Kd_dist_2 * (error_dist - prev_error_dist) / elapsedTime;
+      u_dist = Kp_dist_4 * error_dist + Ki_dist_4 * int_error_dist + Kd_dist_4 * (error_dist - prev_error_dist) / elapsedTime;
 
       // Calculo de las señales de control de inclinación
       u_D = (velocidad + u_dist/2);
@@ -483,22 +492,25 @@ void loop() {
       // Calculo de las señales de control de inclinación
       D_dif = DD - DI;
       // Condicion para entrar en control de "cambio de carril"
-      if(D_dif >= D_dif_max)
-      {
-        flag = 1;
-        if(error_dist > 0)  Ref_dif = -D_dif_max;
-        else                Ref_dif =  D_dif_max;
-      }
+      
       // Condicion para desactivar el control de "cambio de carril"
+      if(D_dif > 10)  D_dif = 0;
+      
       if(flag == 1 && (D > Ref_dist - (5) || D < Ref_dist + (5)))
       {
         if(error_dist > 0)  Ref_dif = -D_dif_max/2;
         else                Ref_dif =  D_dif_max/2;
       }
-      if(flag == 1 && (D > Ref_dist - (0) || D < Ref_dist + (0)))
+      else if(flag == 1 && (D > Ref_dist - (0) || D < Ref_dist + (0)))
       {
         flag = 0;
         Ref_dif = 0;
+      }
+      else if(abs(D_dif) >= D_dif_max)
+      {
+        flag = 1;
+        if(error_dist > 0)  Ref_dif = -D_dif_max;
+        else                Ref_dif =  D_dif_max;
       }
       
       // Control de "cambio de carril"
@@ -507,11 +519,11 @@ void loop() {
         prev_error_dif = error_dif;
         error_dif = Ref_dif - D_dif;
         int_error_dif += elapsedTime * error_dif;
-        u_dif = Kp_dif_2 * error_dif + Ki_dif_2 * int_error_dif + Kd_dif_2 * (error_dif - prev_error_dif) / elapsedTime;
+        u_dif = Kp_dif_4 * error_dif + Ki_dif_4 * int_error_dif + Kd_dif_4 * (error_dif - prev_error_dif) / elapsedTime;
 
         // Calculo de las señales de control de inclinación
-        u_D = (velocidad + u_dif/2);
-        u_I = (velocidad - u_dif/2);
+        u_D += u_dif/2;
+        u_I -= u_dif/2;
       }      
 
 
@@ -579,14 +591,17 @@ void loop() {
       int_error_dist += elapsedTime * error_dist;
 
       // Calculo de la referencia del siguiente control
-      Ref_dif = Kp_dist_2 * error_dist + Ki_dist_2 * int_error_dist + Kd_dist_2 * (error_dist - prev_error_dist) / elapsedTime;
+      Ref_dif = Kp_dist_5 * error_dist + Ki_dist_5 * int_error_dist + Kd_dist_5 * (error_dist - prev_error_dist) / elapsedTime;
 
+      if(Ref_dif > 7.5)   Ref_dif = 7.5;
+      if(Ref_dif < 7.5)   Ref_dif = -7.5;
+      
       // Control de angulo
       D_dif = DD - DI;
       prev_error_dif = error_dif;
       error_dif = Ref_dif - D_dif;
       int_error_dif += elapsedTime * error_dif;
-      u_dif = Kp_dif_2 * error_dif + Ki_dif_2 * int_error_dif + Kd_dif_2 * (error_dif - prev_error_dif) / elapsedTime;
+      u_dif = Kp_dif_5 * error_dif + Ki_dif_5 * int_error_dif + Kd_dif_5 * (error_dif - prev_error_dif) / elapsedTime;
 
       // Calculo de las señales de control de inclinación
       u_D = (velocidad + u_dif);
@@ -640,6 +655,73 @@ void loop() {
       analogWrite(ENI, abs(u_I));
 
       DD_anterior = DD;
+      break;
+
+      case 6:
+      // Calculo de las señales de control en distancia
+      if(DD_anterior == -1) DD_anterior = DD;
+      if(Ref_anterior == -1) Ref_anterior = Ref_dist;
+
+      if(abs(DD_anterior - DD) > 10)  DD = DD_anterior;
+      D = DD;
+      prev_error_dist = error_dist;
+      error_dist = D - Ref_dist;
+      //if(error_dist > 10)   error_dist = 10;
+      int_error_dist += elapsedTime * error_dist;
+      u_dist = Kp_dist_6 * error_dist + Ki_dist_6 * int_error_dist + Kd_dist_6 * (error_dist - prev_error_dist) / elapsedTime;
+
+     
+      u_D = (velocidad/2 + u_dist/2);
+      u_I = (velocidad/2 - u_dist/2);
+
+      // Configuracion de lo pines del servomotor derecho
+      if(u_D == 0) {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, LOW);
+      }
+      else if (u_D > 0) {
+        digitalWrite(IN3, HIGH);
+        digitalWrite(IN4, LOW);
+        u_D += Offset;
+      }
+      else {
+        digitalWrite(IN3, LOW);
+        digitalWrite(IN4, HIGH);
+        u_D -= Offset;
+      }
+
+      // Configuracion de lo pines del servomotor izquierdo
+      if(u_I == 0) {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, LOW);
+      }
+      else if (u_I > 0) {
+        digitalWrite(IN1, HIGH);
+        digitalWrite(IN2, LOW);
+        u_I += Offset;
+      }
+      else {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, HIGH);
+        u_I -= Offset;
+      }
+    
+      // Anti-windup básico
+      if (u_dist < -255 || 255 < u_dist)  int_error_dist -= elapsedTime * error_dist;
+      if (u_dif < -255 || 255 < u_dif)  int_error_dif -= elapsedTime * error_dif;
+    
+      // Saturaciones
+      if (u_D > 255)  u_D = 255;
+      else if (u_D < - 255) u_D = - 255;
+      if (u_I > 255)  u_I = 255;
+      else if (u_I < - 255) u_I = - 255;
+
+      // Aplicacion de las señales de control a cada servomotor
+      analogWrite(END, abs(u_D));
+      analogWrite(ENI, abs(u_I));
+
+      DD_anterior = DD;
+      Ref_anterior = Ref_dist;
       break;
       
     default: 
@@ -701,6 +783,4 @@ void loop() {
 
   // Flag del modo 4
   Serial1.println(flag);
-
-  
 }
